@@ -4,7 +4,10 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
+
 #include <cstdio>
+#include <iostream>
+#include <thread>
 #include <enet/enet.h>
 
 int networkTest();
