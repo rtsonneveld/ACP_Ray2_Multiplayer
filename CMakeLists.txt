@@ -38,3 +38,10 @@ target_link_libraries(ACP_Ray2_Multiplayer PRIVATE
     ws2_32
     winmm
 )
+
+# Copy mod to game directory
+add_custom_command(TARGET ACP_Ray2_Multiplayer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        $<TARGET_FILE:ACP_Ray2_Multiplayer>
+        "$ENV{rayman2}/"
+)
