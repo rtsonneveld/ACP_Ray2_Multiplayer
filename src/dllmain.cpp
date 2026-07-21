@@ -1,17 +1,16 @@
-#include "framework.h"
-#include "network/network.h"
+#include "mod.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule, DWORD dwReason, LPVOID lpReserved )
 {
 	switch ( dwReason )
 	{
-		case DLL_PROCESS_ATTACH: /* create function hooks here */
-			/* FHK_fn_lCreateHook((void**)&GAM_fn_vEngine, (void*)MOD_fn_vEngine); */
-			networkTest();
+		case DLL_PROCESS_ATTACH:
+			FHK_M_lCreateHook(&GAM_fn_vEngine, MOD_EngineTick);
+			NTW_test();
 			break;
 
-		case DLL_PROCESS_DETACH: /* destroy function hooks here*/
-			/* FHK_fn_lDestroyHook((void**)&GAM_fn_vEngine, (void*)MOD_fn_vEngine); */
+		case DLL_PROCESS_DETACH:
+			FHK_M_lDestroyHook(&GAM_fn_vEngine, MOD_EngineTick);
 			break;
 
 		case DLL_THREAD_ATTACH:

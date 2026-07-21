@@ -2,13 +2,15 @@
 
 #include "../network.h"
 
-#define RAYMAN_SERVER_PORT 53123
-
+/** The logical server run by the current host. Server relays information and holds minimal state. */
 class RaymanServer {
 private:
 	ENetHost* server;
 	std::thread thread;
 	std::atomic<bool> running {false};
+
+	/** Resets the connection. */
+	void reset();
 
 public:
 	/** Initializes the server with the given address. */
@@ -16,6 +18,12 @@ public:
 
 	/** Ticks the server thread. */
 	void tick();
+
+	/** Broadcasts the given packet. */
+	void broadcast(Packet packet);
+
+	/** Sends the given packet to the given player. */
+	void send(int playerId, Packet packet);
 
 	/** Shuts down the server. */
 	void shutdown();

@@ -26,15 +26,18 @@ target_include_directories(ACP_Ray2_Multiplayer PRIVATE
     src
     ${ENET_INCLUDE_DIR}
     "$ENV{acplib}/include"
+    "$ENV{r2console}/src"
 )
 
 target_link_directories(ACP_Ray2_Multiplayer PRIVATE
     "$ENV{acplib}/lib"
+    "$ENV{r2console}/Release"
 )
 
 target_link_libraries(ACP_Ray2_Multiplayer PRIVATE
     ${ENET_LIBRARY}
     ACP_Ray2
+    R2Console
     ws2_32
     winmm
 )
