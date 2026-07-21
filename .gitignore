@@ -99,3 +99,6 @@ x86/
 
 # Build
 out/
+
+# vcpkg
+vcpkg_installed/
