@@ -5,13 +5,11 @@ project ("ACP_Ray2_Multiplayer" LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add ENet as a dependency
-find_path(ENET_INCLUDE_DIR
-    NAMES enet/enet.h
-)
-find_library(ENET_LIBRARY
-    NAMES enet
-)
+# Add ENet and libjuice as dependencies
+find_path(ENET_INCLUDE_DIR NAMES enet/enet.h)
+find_path(LIBJUICE_INCLUDE_DIR NAMES juice/juice.h)
+find_library(ENET_LIBRARY NAMES enet)
+find_library(LIBJUICE_LIBRARY NAMES juice)
 
 # Collect all source files in src/
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
@@ -25,6 +23,7 @@ add_library("ACP_Ray2_Multiplayer" SHARED ${SOURCES})
 target_include_directories(ACP_Ray2_Multiplayer PRIVATE
     src
     ${ENET_INCLUDE_DIR}
+    ${LIBJUICE_INCLUDE_DIR}
     "$ENV{acplib}/include"
     "$ENV{r2console}/src"
 )
@@ -36,6 +35,7 @@ target_link_directories(ACP_Ray2_Multiplayer PRIVATE
 
 target_link_libraries(ACP_Ray2_Multiplayer PRIVATE
     ${ENET_LIBRARY}
+    ${LIBJUICE_LIBRARY}
     ACP_Ray2
     R2Console
     ws2_32
