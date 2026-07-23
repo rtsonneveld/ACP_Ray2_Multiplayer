@@ -120,12 +120,14 @@ void RaymanClient::disconnect() {
 	awaitDisconnect = milliseconds + 3000;
 }
 
-void RaymanClient::send(Packet packet) {
+template<typename T>
+void RaymanClient::send(const T& packet) {
 	if (!connected) {
 		LOG_Print("Cannot send packet while not connected to server");
 		return;
 	}
-	ENetPacket* enetPacket = enet_packet_create("packet", strlen("packet") + 1, ENET_PACKET_FLAG_RELIABLE);
+	auto encoded = NTW_EncodePacket(packet);
+	ENetPacket* enetPacket = enet_packet_create(encoded.get(), encoded.length, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(peer, 0, enetPacket);
 }
 

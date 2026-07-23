@@ -20,10 +20,12 @@ public:
 	void tick();
 
 	/** Broadcasts the given packet. */
-	void broadcast(Packet packet);
+	template<typename T>
+	void broadcast(const T& packet);
 
 	/** Sends the given packet to the given player. */
-	void send(int playerId, Packet packet);
+	template<typename T>
+	void send(uint32_t playerId, const T& packet);
 
 	/** Shuts down the server. */
 	void shutdown();

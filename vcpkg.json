@@ -1,6 +1,7 @@
 {
   "dependencies": [
     "enet",
-    "libjuice"
+    "libjuice",
+    "bitsery"
   ]
 }

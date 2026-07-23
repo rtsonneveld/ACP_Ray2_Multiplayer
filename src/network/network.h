@@ -22,7 +22,7 @@
 #include <juice/juice.h>
 #include <enet/enet.h>
 
-#include "packet/packet.h"
+#include "packet/registry.h"
 #include "../util/logging.h"
 
 int NTW_test();

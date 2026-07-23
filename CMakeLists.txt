@@ -5,9 +5,10 @@ project ("ACP_Ray2_Multiplayer" LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add ENet and libjuice as dependencies
+# Add dependencies
 find_path(ENET_INCLUDE_DIR NAMES enet/enet.h)
 find_path(LIBJUICE_INCLUDE_DIR NAMES juice/juice.h)
+find_path(BITSERY_INCLUDE_DIR "bitsery/bitsery.h")
 find_library(ENET_LIBRARY NAMES enet)
 find_library(LIBJUICE_LIBRARY NAMES juice)
 
@@ -24,6 +25,7 @@ target_include_directories(ACP_Ray2_Multiplayer PRIVATE
     src
     ${ENET_INCLUDE_DIR}
     ${LIBJUICE_INCLUDE_DIR}
+    ${BITSERY_INCLUDE_DIR}
     "$ENV{acplib}/include"
     "$ENV{r2console}/src"
 )

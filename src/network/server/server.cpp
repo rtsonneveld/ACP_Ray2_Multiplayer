@@ -1,4 +1,5 @@
 #include "server.h"
+#include "../packet/serverbound_play_packets.h"
 
 void RaymanServer::initialize(ENetAddress address) {
 	// Create the server host itself
@@ -27,19 +28,30 @@ void RaymanServer::tick() {
 	while (running) {
 		if (enet_host_service(server, &event, 50) > 0) {
 			switch (event.type) {
-			case ENET_EVENT_TYPE_CONNECT:
+			case ENET_EVENT_TYPE_CONNECT: {
 				char ip[64];
 				enet_address_get_host_ip(&event.peer->address, ip, sizeof(ip));
 				LOG_Print("Received new connection from %s:%d", ip, event.peer->address.port);
 				// TODO Track clients and identify them with player id
 				break;
-			case ENET_EVENT_TYPE_RECEIVE:
+			}
+			case ENET_EVENT_TYPE_RECEIVE: {
 				LOG_Print("[server] Received packet of length %u from %s:%d", event.packet->dataLength, event.peer->address.host, event.peer->address.port);
+				auto decoder = NTW_DecodePacket(reinterpret_cast<uint8_t*>(event.packet->data), event.packet->dataLength);
+				switch (decoder.id()) {
+				case 0: {
+					auto packet = decoder.get<ServerboundMovePacket>();
+					LOG_Print("[server] Received movement packet!");
+					break;
+				}
+				}
 				enet_packet_destroy(event.packet);
 				break;
-			case ENET_EVENT_TYPE_DISCONNECT:
+			}
+			case ENET_EVENT_TYPE_DISCONNECT: {
 				LOG_Print("Received disconnect request from %s:%d", event.peer->address.host, event.peer->address.port);
 				break;
+			}
 			}
 		}
 	}
@@ -51,13 +63,17 @@ void RaymanServer::shutdown() {
 	enet_host_destroy(server);
 }
 
-void RaymanServer::broadcast(Packet packet) {
-	ENetPacket* enetPacket = enet_packet_create("packet", strlen("packet") + 1, ENET_PACKET_FLAG_RELIABLE);
+template<typename T>
+void RaymanServer::broadcast(const T& packet) {
+	auto encoded = NTW_EncodePacket(packet);
+	ENetPacket* enetPacket = enet_packet_create(encoded.get(), encoded.length, ENET_PACKET_FLAG_RELIABLE);
 	enet_host_broadcast(server, 0, enetPacket);
 }
 
-void RaymanServer::send(int playerId, Packet packet) {
-	ENetPacket* enetPacket = enet_packet_create("packet", strlen("packet") + 1, ENET_PACKET_FLAG_RELIABLE);
+template<typename T>
+void RaymanServer::send(uint32_t playerId, const T& packet) {
+	auto encoded = NTW_EncodePacket(packet);
+	ENetPacket* enetPacket = enet_packet_create(encoded.get(), encoded.length, ENET_PACKET_FLAG_RELIABLE);
 	ENetPeer* peer;
 	// TODO Identify which peer based on the player id
 	enet_peer_send(peer, 0, enetPacket);

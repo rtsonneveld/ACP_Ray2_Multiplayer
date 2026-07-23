@@ -30,7 +30,8 @@ public:
 	void shutdown();
 
 	/** Sends a packet to the server. */
-	void send(Packet packet);
+	template<typename T>
+	void send(const T& packet);
 
 	/** Connects to a server at the given hostname and port. */
 	void connect(std::string hostname, int port);
