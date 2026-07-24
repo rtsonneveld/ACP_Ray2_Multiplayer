@@ -1,4 +1,3 @@
-#include "network/network.h"
 #include "mod.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule, DWORD dwReason, LPVOID lpReserved )
