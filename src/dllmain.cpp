@@ -1,3 +1,4 @@
+#include "network/network.h"
 #include "mod.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule, DWORD dwReason, LPVOID lpReserved )
@@ -6,7 +7,9 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD dwReason, LPVOID lpReserved )
 	{
 		case DLL_PROCESS_ATTACH:
 			FHK_M_lCreateHook(&GAM_fn_vEngine, MOD_EngineTick);
-			NTW_test();
+			NTW_Initialize();
+			MOD_RegisterCommands();
+			LOG_Print("Finished starting ACP_Ray2Multiplayer");
 			break;
 
 		case DLL_PROCESS_DETACH:

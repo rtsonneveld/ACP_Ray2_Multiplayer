@@ -22,6 +22,9 @@ public:
 
 	/** Hands over this connection to ENet. */
 	EstablishedConnection handover();
+
+	/** Destroys the connection. */
+	void destroy();
 };
 
 /** Starts the process of finding peers. */

@@ -1,5 +1,26 @@
 #include "peer.h"
 
+void on_state_changed(juice_agent_t* agent, juice_state_t state, void* user_ptr) {
+	LOG_Print("State: %s", juice_state_to_string(state));
+}
+
+void on_candidate(juice_agent_t* agent, const char* sdp, void* user_ptr) {
+	LOG_Print("Candidate: %s", sdp);
+}
+
+void on_gathering_done(juice_agent_t* agent, void* user_ptr) {
+	LOG_Print("Gathering done");
+}
+
+void on_receive(juice_agent_t* agent, const char* data, size_t size, void* user_ptr) {
+	char buffer[256];
+	if (size > 255)
+		size = 255;
+	memcpy(buffer, data, size);
+	buffer[size] = '\0';
+	LOG_Print("Received %s", buffer);
+}
+
 void P2PConnection::initialize() {
 	juice_set_log_level(JUICE_LOG_LEVEL_DEBUG);
 	
@@ -9,10 +30,10 @@ void P2PConnection::initialize() {
 	config.stun_server_host = "stun.l.google.com";
 	config.stun_server_port = 19302;
 	config.user_ptr = NULL;
-
-	// TODO Send mesages over juice to establish the handshake and determine a host
-	// based on which side is older
-	// https://github.com/paullouisageneau/libjuice/blob/master/test/connectivity.c
+	config.cb_state_changed = on_state_changed;
+	config.cb_candidate = on_candidate;
+	config.cb_gathering_done = on_gathering_done;
+	config.cb_recv = on_receive;
 
 	// Create the agent
 	agent = juice_create(&config);
@@ -50,15 +71,16 @@ EstablishedConnection P2PConnection::handover() {
 	ss >> conn.hostname;
 	ss >> conn.port;
 	LOG_Print("Found connection over %s:%d", conn.hostname.c_str(), conn.port);
+	destroy();
+	return conn;
+}
 
+void P2PConnection::destroy() {
 	// Destroy the agent
 	juice_destroy(agent);
 
-	// Wait so the OS has time to destroyt he socket
+	// Wait so the OS has time to destroy the socket
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-	// Return the established connection we set earlier in on_gathering_done
-	return conn;
 }
 
 std::unique_ptr<P2PConnection> createP2P() {

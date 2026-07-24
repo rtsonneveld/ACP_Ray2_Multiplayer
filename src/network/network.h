@@ -25,4 +25,19 @@
 #include "packet/registry.h"
 #include "../util/logging.h"
 
-int NTW_test();
+enum class NetworkState {
+	NONE,
+	SEARCHING,
+	HANDSHAKE,
+	HOST,
+	PLAYER
+};
+
+/** Initializes multiplayer connectivity. */
+void NTW_Initialize();
+
+/** Returns the current networking state. */
+NetworkState NTW_GetState();
+
+/** Starts searching for STUN connections. */
+void NTW_StartSearch();
