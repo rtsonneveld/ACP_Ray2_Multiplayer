@@ -20,6 +20,9 @@ public:
 	/** Returns whether the connection was successfully made. */
 	bool isSuccessful();
 
+	/** Starts connecting using current information in clipboard. */
+	void connect();
+
 	/** Hands over this connection to ENet. */
 	EstablishedConnection handover();
 

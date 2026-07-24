@@ -1,15 +1,17 @@
 #include "peer.h"
-
-void on_state_changed(juice_agent_t* agent, juice_state_t state, void* user_ptr) {
-	LOG_Print("State: %s", juice_state_to_string(state));
-}
-
-void on_candidate(juice_agent_t* agent, const char* sdp, void* user_ptr) {
-	LOG_Print("Candidate: %s", sdp);
-}
+#include "../../util/clipboard.h"
+#include "../../util/base64.h"
 
 void on_gathering_done(juice_agent_t* agent, void* user_ptr) {
-	LOG_Print("Gathering done");
+	char sdp[JUICE_MAX_SDP_STRING_LEN];
+	auto result = juice_get_local_description(agent, sdp, sizeof(sdp));
+	if (result < 0) {
+		LOG_Print("Failed to find peers!");
+		return;
+	}
+	SetClipboard(base64_encode(sdp, strlen(sdp)));
+	LOG_Print("Copied information to clipboard, send this to peer!");
+	NTW_SetState(NetworkState::SEARCHING, NetworkState::WAITING);
 }
 
 void on_receive(juice_agent_t* agent, const char* data, size_t size, void* user_ptr) {
@@ -29,9 +31,7 @@ void P2PConnection::initialize() {
 	memset(&config, 0, sizeof(config));
 	config.stun_server_host = "stun.l.google.com";
 	config.stun_server_port = 19302;
-	config.user_ptr = NULL;
-	config.cb_state_changed = on_state_changed;
-	config.cb_candidate = on_candidate;
+	config.user_ptr = this;
 	config.cb_gathering_done = on_gathering_done;
 	config.cb_recv = on_receive;
 
@@ -44,6 +44,13 @@ void P2PConnection::initialize() {
 
 	// Start the gathering process
 	juice_gather_candidates(agent);
+}
+
+void P2PConnection::connect() {
+	std::string sdp = base64_decode(ReadClipboard());
+	juice_set_remote_description(agent, sdp.c_str());
+
+	// TODO Look at continuing from here
 }
 
 bool P2PConnection::isSuccessful() {

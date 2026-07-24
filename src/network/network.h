@@ -28,6 +28,7 @@
 enum class NetworkState {
 	NONE,
 	SEARCHING,
+	WAITING,
 	HANDSHAKE,
 	HOST,
 	PLAYER
@@ -39,5 +40,11 @@ void NTW_Initialize();
 /** Returns the current networking state. */
 NetworkState NTW_GetState();
 
+/** Updates the current networking state. */
+bool NTW_SetState(NetworkState from, NetworkState to);
+
 /** Starts searching for STUN connections. */
 void NTW_StartSearch();
+
+/** Connects to the peer given the current SDP in the clipboard. */
+void NTW_ConnectToPeer();

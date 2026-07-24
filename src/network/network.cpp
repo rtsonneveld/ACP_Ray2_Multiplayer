@@ -12,6 +12,12 @@ NetworkState NTW_GetState() {
 	return state;
 }
 
+bool NTW_SetState(NetworkState from, NetworkState to) {
+	if (state != from) return false;
+	state = to;
+	return true;
+}
+
 void NTW_Initialize() {
 	if (enet_initialize() != 0) {
 		fprintf(stderr, "An error occurred while initializing ENet.\n");
@@ -21,13 +27,19 @@ void NTW_Initialize() {
 }
 
 void NTW_StartSearch() {
-	if (state != NetworkState::NONE) {
+	if (!NTW_SetState(NetworkState::NONE, NetworkState::SEARCHING)) {
 		LOG_Print("Cannot start searching for connections while already connected");
 		return;
 	}
-
-	state = NetworkState::SEARCHING;
 	p2p = createP2P();
+}
+
+void NTW_ConnectToPeer() {
+	if (!NTW_SetState(NetworkState::WAITING, NetworkState::HANDSHAKE)) {
+		LOG_Print("Cannot connect without being in waiting state");
+		return;
+	}
+	p2p->connect();
 }
 
 void NTW_test() {

@@ -1,6 +1,13 @@
 #pragma once
 
+#include <windows.h>
+#include <queue>
+#include <mutex>
 #include <string>
+
+extern "C" {
+#include <r2console_api.h>
+};
 
 /** Prints the given message to the console and logs. */
 void LOG_Print(const std::string message, ...);

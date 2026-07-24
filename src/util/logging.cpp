@@ -1,12 +1,4 @@
 #include "logging.h"
-#include <windows.h>
-#include <queue>
-#include <mutex>
-#include <string>
-
-extern "C" {
-	#include <r2console_api.h>
-};
 
 std::queue<std::string> logQueue;
 std::mutex logMutex;
