@@ -1,0 +1,3 @@
+[submodule "submodules/R2Console"]
+	path = submodules/R2Console
+	url = https://github.com/spitfirex86/R2Console/

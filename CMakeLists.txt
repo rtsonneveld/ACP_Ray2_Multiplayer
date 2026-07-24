@@ -20,6 +20,20 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 # Build as DLL
 add_library("ACP_Ray2_Multiplayer" SHARED ${SOURCES})
 
+include(ExternalProject)
+
+ExternalProject_Add(
+    R2Console_Build
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/submodules/R2Console"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND msbuild "${CMAKE_CURRENT_SOURCE_DIR}/submodules/R2Console/R2Console.sln"
+                  /p:Configuration=$<CONFIG>
+                  /p:Platform=x86
+    INSTALL_COMMAND ""
+)
+
+add_dependencies(ACP_Ray2_Multiplayer R2Console_Build)
+
 # Include dependencies and sources
 target_include_directories(ACP_Ray2_Multiplayer PRIVATE
     src
@@ -27,12 +41,12 @@ target_include_directories(ACP_Ray2_Multiplayer PRIVATE
     ${LIBJUICE_INCLUDE_DIR}
     ${BITSERY_INCLUDE_DIR}
     "$ENV{acplib}/include"
-    "$ENV{r2console}/src"
+    "submodules/R2Console/src"
 )
 
 target_link_directories(ACP_Ray2_Multiplayer PRIVATE
     "$ENV{acplib}/lib"
-    "$ENV{r2console}/Release"
+    "submodules/R2Console/$<CONFIG>"
 )
 
 target_link_libraries(ACP_Ray2_Multiplayer PRIVATE
