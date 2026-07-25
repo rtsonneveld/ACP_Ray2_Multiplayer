@@ -66,14 +66,14 @@ void RaymanServer::shutdown() {
 template<typename T>
 void RaymanServer::broadcast(const T& packet) {
 	auto encoded = NTW_EncodePacket(packet);
-	ENetPacket* enetPacket = enet_packet_create(encoded.get(), encoded.length, ENET_PACKET_FLAG_RELIABLE);
+	ENetPacket* enetPacket = enet_packet_create(encoded.get(), encoded.length(), ENET_PACKET_FLAG_RELIABLE);
 	enet_host_broadcast(server, 0, enetPacket);
 }
 
 template<typename T>
 void RaymanServer::send(uint32_t playerId, const T& packet) {
 	auto encoded = NTW_EncodePacket(packet);
-	ENetPacket* enetPacket = enet_packet_create(encoded.get(), encoded.length, ENET_PACKET_FLAG_RELIABLE);
+	ENetPacket* enetPacket = enet_packet_create(encoded.get(), encoded.length(), ENET_PACKET_FLAG_RELIABLE);
 	ENetPeer* peer;
 	// TODO Identify which peer based on the player id
 	enet_peer_send(peer, 0, enetPacket);

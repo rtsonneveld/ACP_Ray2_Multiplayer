@@ -28,6 +28,10 @@ public:
 
 	/** Destroys the connection. */
 	void destroy();
+
+	/** Sends a packet to the peer. */
+	template<typename T>
+	void send(const T& packet);
 };
 
 /** Starts the process of finding peers. */

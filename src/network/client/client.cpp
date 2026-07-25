@@ -127,7 +127,7 @@ void RaymanClient::send(const T& packet) {
 		return;
 	}
 	auto encoded = NTW_EncodePacket(packet);
-	ENetPacket* enetPacket = enet_packet_create(encoded.get(), encoded.length, ENET_PACKET_FLAG_RELIABLE);
+	ENetPacket* enetPacket = enet_packet_create(encoded.get(), encoded.length(), ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(peer, 0, enetPacket);
 }
 
