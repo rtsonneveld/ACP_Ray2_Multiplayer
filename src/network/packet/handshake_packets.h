@@ -1,4 +1,5 @@
 #pragma once
+#include "constants.h"
 
 /** Sent to peer to start the handshake. */
 struct HandshakeIntroductionPacket {
@@ -10,7 +11,7 @@ struct HandshakeIntroductionPacket {
 
 template<typename S>
 void serialize(S& s, HandshakeIntroductionPacket& p) {
-    s.text1b(p.username, 64);
+    s.text1b(p.username, R2MP::Constants::MaxPlayerNameLength);
     s.value8b(p.bootTime);
     s.value1b(p.isServer);
 }

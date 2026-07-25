@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../../util/vector.h"
+#include "constants.h"
+#include <map>
 
 /** Sent to the client to spawn a new player. */
 struct ClientboundPlayerAddPacket {
@@ -50,4 +52,40 @@ void serialize(S& s, ClientboundPlayerChangeLevelPacket& p) {
 	s.value4b(p.playerId);
 	s.value2b(p.levelId);
 	s.object(p.position);
+}
+
+/** Response sent to the client that requests to join. */
+struct ClientboundLoginResponsePacket {
+	static constexpr uint16_t ID = 4;
+	uint32_t playerId;
+	// TODO: add error codes/message here at some point
+};
+
+template<typename S>
+void serialize(S& s, ClientboundLoginResponsePacket& p) {
+	s.value4b(p.playerId);
+}
+
+/** Player added broadcast */
+struct ClientboundAddPlayer {
+	static constexpr uint16_t ID = 5;
+	uint32_t playerId;
+	std::string playerName;
+};
+
+template<typename S>
+void serialize(S& s, ClientboundAddPlayer& p) {
+	s.value4b(p.playerId);
+	s.text4b(p.playerName, R2MP::Constants::MaxPlayerNameLength);
+}
+
+/** Player removed broadcast */
+struct ClientboundRemovePlayer {
+	static constexpr uint16_t ID = 6;
+	uint32_t playerId;
+};
+
+template<typename S>
+void serialize(S& s, ClientboundRemovePlayer& p) {
+	s.value4b(p.playerId);
 }

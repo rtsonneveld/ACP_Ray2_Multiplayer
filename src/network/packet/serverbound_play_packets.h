@@ -12,3 +12,13 @@ template<typename S>
 void serialize(S& s, ServerboundMovePacket& p) {
 	s.object(p.position);
 }
+
+struct ServerboundRequestLoginPacket {
+	static constexpr uint16_t ID = 1;
+	std::string username;
+};
+
+template<typename S>
+void serialize(S& s, ServerboundRequestLoginPacket& p) {
+	s.text1b(p.username);
+}
