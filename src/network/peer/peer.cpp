@@ -9,13 +9,16 @@ void on_state_changed(juice_agent_t* agent, juice_state_t state, void* user_ptr)
 		NTW_SetState(NetworkState::WAITING, NetworkState::HANDSHAKE);
 
 		// Send the introduction packet with player information
-		P2PConnection* p2p = (P2PConnection*) user_ptr;
+		P2PConnection* p2p = (P2PConnection*)user_ptr;
 		HandshakeIntroductionPacket packet{
 			.username = NTW_GetUsername(),
 			.bootTime = NTW_GetBootTime(),
 			.isServer = NTW_IsRunningServer()
 		};
 		p2p->send(packet);
+	} else if (state == JUICE_STATE_FAILED) {
+		LOG_Print("Failed to create connection to peer, please try again!");
+		NTW_ResetState();
 	}
 }
 
@@ -32,12 +35,15 @@ void on_gathering_done(juice_agent_t* agent, void* user_ptr) {
 }
 
 void on_receive(juice_agent_t* agent, const char* data, size_t size, void* user_ptr) {
-	char buffer[256];
-	if (size > 255)
-		size = 255;
-	memcpy(buffer, data, size);
-	buffer[size] = '\0';
-	LOG_Print("Received %s", buffer);
+	const auto* bytes = reinterpret_cast<const uint8_t*>(data);
+	auto decoder = NTW_DecodePacket(bytes, size);
+	switch (decoder.id()) {
+	case 0: {
+		auto packet = decoder.get<HandshakeIntroductionPacket>();
+		LOG_Print("[peer] Received introduction packet from %s!", packet.username.data());
+		break;
+	}
+	}
 }
 
 void P2PConnection::initialize() {

@@ -23,5 +23,5 @@ struct RequestTransferPacket {
 
 template<typename S>
 void serialize(S& s, RequestTransferPacket& p) {
-    s.value4b(p.host);
+    s.text1b(p.host, 64);
 }

@@ -51,6 +51,9 @@ void NTW_Initialize();
 /** Returns the current networking state. */
 NetworkState NTW_GetState();
 
+/** Resets the networking state. */
+void NTW_ResetState();
+
 /** Updates the current networking state. */
 bool NTW_SetState(NetworkState from, NetworkState to);
 

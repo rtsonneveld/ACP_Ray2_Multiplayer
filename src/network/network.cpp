@@ -42,10 +42,32 @@ NetworkState NTW_GetState() {
 	return state;
 }
 
+const char* GetStateName(NetworkState state) {
+	switch (state) {
+	case NetworkState::NONE: return "NONE";
+	case NetworkState::SEARCHING: return "SEARCHING";
+	case NetworkState::WAITING: return "WAITING";
+	case NetworkState::HANDSHAKE: return "HANDSHAKE";
+	case NetworkState::PLAYER: return "PLAYER";
+	}
+	return "UNKNOWN";
+}
+
+void NTW_ResetState() {
+	// Destroy any created connections and reset to none so we can restart the process
+	if (p2p != nullptr) {
+		p2p->destroy();
+		p2p = nullptr;
+	}
+	LOG_Print("State %s -> %s", GetStateName(state), GetStateName(NetworkState::NONE));
+	state = NetworkState::NONE;
+}
+
 bool NTW_SetState(NetworkState from, NetworkState to) {
+	// Update the state if it's coming from the correct one and debug print about it
 	if (state != from) return false;
 	state = to;
-	LOG_Print("State %s -> %s", from, to);
+	LOG_Print("State %s -> %s", GetStateName(from), GetStateName(to));
 	return true;
 }
 
