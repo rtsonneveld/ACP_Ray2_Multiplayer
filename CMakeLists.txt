@@ -58,9 +58,14 @@ target_link_libraries(ACP_Ray2_Multiplayer PRIVATE
     winmm
 )
 
-# Copy mod to game directory
+# Copy mod to game directory and launch two independent instances 5 seconds apart
 add_custom_command(TARGET ACP_Ray2_Multiplayer POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
         $<TARGET_FILE:ACP_Ray2_Multiplayer>
         "$ENV{rayman2}/"
+    COMMAND powershell -Command "Start-Process -FilePath 'Ray2x.exe' -ArgumentList '-level:learn_30'"
+    COMMAND ${CMAKE_COMMAND} -E sleep 5
+    COMMAND powershell -Command "Start-Process -FilePath 'Ray2x.exe' -ArgumentList '-level:learn_30'"
+    WORKING_DIRECTORY "$ENV{rayman2}/.."
+    VERBATIM
 )
