@@ -1,6 +1,6 @@
 #pragma once
 
-class StateManager;
+#include "../state/statemanager.h"
 
 namespace R2MP {
 	class DisplayManager {

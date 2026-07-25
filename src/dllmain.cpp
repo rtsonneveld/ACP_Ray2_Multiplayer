@@ -5,6 +5,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD dwReason, LPVOID lpReserved )
 	switch ( dwReason )
 	{
 		case DLL_PROCESS_ATTACH:
+			R2MP::MOD_PatchMutex();
 			FHK_M_lCreateHook(&GAM_fn_vEngine, R2MP::MOD_EngineTick);
 			FHK_M_lCreateHook(&GAM_fn_vDisplayAll, R2MP::MOD_fn_vDisplayAll);
 			NTW_Initialize();

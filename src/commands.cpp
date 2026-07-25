@@ -15,7 +15,9 @@ void fn_vMultiplayer(int length, char** args) {
 	}
 }
 
-void MOD_RegisterCommands() {
-	char name[] = "mp";
-	fn_vRegisterCommand(name, fn_vMultiplayer);
-}
+namespace R2MP {
+	void MOD_RegisterCommands() {
+		char name[] = "mp";
+		fn_vRegisterCommand(name, fn_vMultiplayer);
+	}
+};

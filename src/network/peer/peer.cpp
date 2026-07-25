@@ -2,6 +2,10 @@
 #include "../../util/clipboard.h"
 #include "../../util/base64.h"
 
+void on_state_changed(juice_agent_t* agent, juice_state_t state, void* user_ptr) {
+	LOG_Print("State: %s", juice_state_to_string(state));
+}
+
 void on_gathering_done(juice_agent_t* agent, void* user_ptr) {
 	char sdp[JUICE_MAX_SDP_STRING_LEN];
 	auto result = juice_get_local_description(agent, sdp, sizeof(sdp));
@@ -32,6 +36,7 @@ void P2PConnection::initialize() {
 	config.stun_server_host = "stun.l.google.com";
 	config.stun_server_port = 19302;
 	config.user_ptr = this;
+	config.cb_state_changed = on_state_changed;
 	config.cb_gathering_done = on_gathering_done;
 	config.cb_recv = on_receive;
 
