@@ -30,9 +30,20 @@ enum class NetworkState {
 	SEARCHING,
 	WAITING,
 	HANDSHAKE,
-	HOST,
 	PLAYER
 };
+
+/** Returns the unique id of this client session. */
+uint32_t NTW_GetClientId();
+
+/** Returns the time when this instance booted up. */
+long long NTW_GetBootTime();
+
+/** Returns the username of the client. */
+std::string NTW_GetUsername();
+
+/** Sets the username of the client. */
+void NTW_SetUsername(std::string username);
 
 /** Initializes multiplayer connectivity. */
 void NTW_Initialize();
@@ -42,6 +53,9 @@ NetworkState NTW_GetState();
 
 /** Updates the current networking state. */
 bool NTW_SetState(NetworkState from, NetworkState to);
+
+/** Whether this client is running a server. */
+bool NTW_IsRunningServer();
 
 /** Starts searching for STUN connections. */
 void NTW_StartSearch();

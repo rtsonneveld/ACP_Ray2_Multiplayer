@@ -5,6 +5,7 @@
 #include "bitsery/bitsery.h"
 #include "bitsery/adapter/buffer.h"
 #include <bitsery/traits/vector.h>
+#include <bitsery/traits/string.h>
 
 /** An encoded packet which can be sent across a socket. */
 struct EncodedPacket {

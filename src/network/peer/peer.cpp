@@ -1,9 +1,22 @@
 #include "peer.h"
+#include "../packet/handshake_packets.h"
 #include "../../util/clipboard.h"
 #include "../../util/base64.h"
 
 void on_state_changed(juice_agent_t* agent, juice_state_t state, void* user_ptr) {
-	LOG_Print("State: %s", juice_state_to_string(state));
+	if (state == JUICE_STATE_COMPLETED) {
+		// Connection is completely between both sides!
+		NTW_SetState(NetworkState::WAITING, NetworkState::HANDSHAKE);
+
+		// Send the introduction packet with player information
+		P2PConnection* p2p = (P2PConnection*) user_ptr;
+		HandshakeIntroductionPacket packet{
+			.username = NTW_GetUsername(),
+			.bootTime = NTW_GetBootTime(),
+			.isServer = NTW_IsRunningServer()
+		};
+		p2p->send(packet);
+	}
 }
 
 void on_gathering_done(juice_agent_t* agent, void* user_ptr) {
@@ -52,14 +65,23 @@ void P2PConnection::initialize() {
 }
 
 void P2PConnection::connect() {
+	// Fill the other side's connection and wait for the handshake to be complete
 	std::string sdp = base64_decode(ReadClipboard());
 	juice_set_remote_description(agent, sdp.c_str());
-
-	// TODO Look at continuing from here
 }
 
 bool P2PConnection::isSuccessful() {
 	return juice_get_state(agent) == JUICE_STATE_COMPLETED;
+}
+
+template<typename T>
+void P2PConnection::send(const T& packet) {
+	if (!isSuccessful()) {
+		LOG_Print("Cannot send packet while not fully connected to peer");
+		return;
+	}
+	auto encoded = NTW_EncodePacket(packet);
+	juice_send(agent, reinterpret_cast<const char*>(encoded.get()), encoded.length());
 }
 
 EstablishedConnection P2PConnection::handover() {

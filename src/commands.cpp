@@ -3,7 +3,7 @@
 /** Main command for interacting with multiplayer. */
 void fn_vMultiplayer(int length, char** args) {
 	if (length < 1) {
-		LOG_Print("Usage: mp <search|connect>");
+		LOG_Print("Usage: mp <search|connect|username>");
 		return;
 	}
 
@@ -12,6 +12,12 @@ void fn_vMultiplayer(int length, char** args) {
 		NTW_StartSearch();
 	} else if (command == "connect") {
 		NTW_ConnectToPeer();
+	} else if (command == "username") {
+		if (length < 2) {
+			LOG_Print("Usage: mp username <username>");
+			return;
+		}
+		NTW_SetUsername(std::string(args[1]));
 	}
 }
 
