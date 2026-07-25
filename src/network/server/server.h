@@ -6,6 +6,8 @@
 class RaymanServer {
 private:
 	ENetHost* server;
+	std::queue<DecodedPacket> packetQueue;
+	std::mutex queueMutex;
 	std::thread thread;
 	std::atomic<bool> running {false};
 
@@ -29,6 +31,9 @@ public:
 
 	/** Shuts down the server. */
 	void shutdown();
+
+	/** Runs pending packets on the engine thread. */
+	void poll();
 };
 
 /** Creates a new host server. */

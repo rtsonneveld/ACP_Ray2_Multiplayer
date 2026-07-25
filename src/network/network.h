@@ -25,12 +25,18 @@
 #include "packet/registry.h"
 #include "../util/logging.h"
 
+/** Stores details on a connection with hostname and port. */
+struct ConnectionDetails {
+	std::string hostname;
+	int port;
+};
+
 enum class NetworkState {
 	NONE,
 	SEARCHING,
 	WAITING,
 	HANDSHAKE,
-	PLAYER
+	PLAY
 };
 
 enum class EnumTestMode {
@@ -72,5 +78,11 @@ void NTW_StartSearch();
 /** Connects to the peer given the current SDP in the clipboard. */
 void NTW_ConnectToPeer();
 
-/** Test function that optionally starts a server locally and creates a client */
-static void NTW_test(EnumTestMode testMode);
+/** Runs any queued packets on the engine thread. */
+void NTW_PollPackets();
+
+/** Starts running a server. */
+void NTW_StartServer();
+
+/** Connects the client across the given connection. */
+void NTW_Connect(ConnectionDetails connection);

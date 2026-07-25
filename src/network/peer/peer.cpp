@@ -37,11 +37,57 @@ void on_gathering_done(juice_agent_t* agent, void* user_ptr) {
 void on_receive(juice_agent_t* agent, const char* data, size_t size, void* user_ptr) {
 	const auto* bytes = reinterpret_cast<const uint8_t*>(data);
 	auto decoder = NTW_DecodePacket(bytes, size);
+	P2PConnection* p2p = (P2PConnection*)user_ptr;
+	p2p->handle(decoder);
+}
+
+void P2PConnection::handle(DecodedPacket& decoder) {
 	switch (decoder.id()) {
 	case 0: {
 		auto packet = decoder.get<HandshakeIntroductionPacket>();
-		LOG_Print("[peer] Received introduction packet from %s!", packet.username.data());
-		break;
+
+		// If both users have the same username, the connection cannot proceed!
+		if (NTW_GetUsername() == packet.username) {
+			LOG_Print("Cannot form connection between users with the same username");
+			destroy();
+			return;
+		}
+
+		// Check that, if we are the server, this username is available
+		if (NTW_IsRunningServer() && NTW_GetUsername() == packet.username) { // TODO Use proper check here when we have server-side player state!
+			LOG_Print("Cannot form connection between users as username is taken");
+			destroy();
+			return;
+		}
+
+		// Determine deterministically who the host will be
+		auto host = NTW_GetUsername();
+		if (packet.isServer) {
+			// Other player is a server, they are the host!
+			packet.username;
+		} else if (NTW_IsRunningServer()) {
+			// We are the host!
+		} else if (packet.bootTime < NTW_GetBootTime()) {
+			// Other player booted earlier, they are the host!
+			host = packet.username;
+		} else if (packet.bootTime == NTW_GetBootTime() && packet.username.compare(NTW_GetUsername()) < 0) {
+			// We somehow tied for boot time but they are alphabetically
+			host = packet.username;
+		}
+		HandshakeRequestTransferPacket confirmPacket{
+			.host = host
+		};
+		send(confirmPacket);
+		return;
+	}
+	case 1: {
+		// When we've confirmed the transfer, if necessary start the server and hand over the connection to ENet.
+		auto packet = decoder.get<HandshakeRequestTransferPacket>();
+		if (packet.host == NTW_GetUsername()) {
+			NTW_StartServer();
+		}
+		NTW_Connect(handover());
+		return;
 	}
 	}
 }
@@ -90,7 +136,7 @@ void P2PConnection::send(const T& packet) {
 	juice_send(agent, reinterpret_cast<const char*>(encoded.get()), encoded.length());
 }
 
-EstablishedConnection P2PConnection::handover() {
+ConnectionDetails P2PConnection::handover() {
 	// Ensure the connection is successfull and we have a valid connection
 	if (!isSuccessful()) {
 		LOG_Print("Tried to hand over incomplete P2P connection");
@@ -101,7 +147,7 @@ EstablishedConnection P2PConnection::handover() {
 	char local[JUICE_MAX_ADDRESS_STRING_LEN];
 	char remote[JUICE_MAX_ADDRESS_STRING_LEN];
 	juice_get_selected_candidates(agent, local, sizeof(local), remote, sizeof(remote));
-	EstablishedConnection conn;
+	ConnectionDetails conn;
 	std::istringstream ss(remote);
 	std::string token;
 	ss >> token;
@@ -110,7 +156,6 @@ EstablishedConnection P2PConnection::handover() {
 	ss >> token;
 	ss >> conn.hostname;
 	ss >> conn.port;
-	LOG_Print("Found connection over %s:%d", conn.hostname.c_str(), conn.port);
 	destroy();
 	return conn;
 }

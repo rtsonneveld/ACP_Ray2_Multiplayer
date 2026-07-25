@@ -8,6 +8,8 @@ private:
 	ENetHost* client;
 	ENetPeer* peer;
 	bool connected;
+	std::queue<DecodedPacket> packetQueue;
+	std::mutex queueMutex;
 	std::thread thread;
 	std::atomic<long> awaitDisconnect{ 0 };
 	std::atomic<bool> awaitConnect{ false };
@@ -38,6 +40,9 @@ public:
 	
 	/** Disconnects from the server. */
 	void disconnect();
+
+	/** Runs pending packets on the engine thread. */
+	void poll();
 };
 
 /** Creates a new client. */

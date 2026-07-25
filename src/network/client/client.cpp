@@ -72,15 +72,19 @@ void RaymanClient::tick() {
 		// Await a packet
 		if (enet_host_service(client, &event, 50) > 0) {
 			switch (event.type) {
-			case ENET_EVENT_TYPE_RECEIVE:
-				LOG_Print("[client] Received packet of length %u", event.packet->dataLength);
+			case ENET_EVENT_TYPE_RECEIVE: {
+				auto decoded = NTW_DecodePacket(reinterpret_cast<uint8_t*>(event.packet->data), event.packet->dataLength);
+				std::lock_guard<std::mutex> lock(queueMutex);
+				packetQueue.push(std::move(decoded));
 				enet_packet_destroy(event.packet);
 				break;
-			case ENET_EVENT_TYPE_DISCONNECT:
+			}
+			case ENET_EVENT_TYPE_DISCONNECT: {
 				LOG_Print("Successfully disconnected from server, data=%u", event.data);
 				enet_peer_reset(peer);
 				connected = false;
 				break;
+			}
 			}
 		}
 	}
@@ -139,4 +143,13 @@ std::unique_ptr<RaymanClient> createClient() {
 	auto raymanClient = std::make_unique<RaymanClient>();
 	raymanClient->initialize();
 	return raymanClient;
+}
+
+void RaymanClient::poll() {
+	std::lock_guard<std::mutex> lock(queueMutex);
+	while (!packetQueue.empty()) {
+		auto& decoder = packetQueue.front();
+
+		packetQueue.pop();
+	}
 }

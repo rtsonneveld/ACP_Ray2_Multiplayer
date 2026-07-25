@@ -16,12 +16,12 @@ void serialize(S& s, HandshakeIntroductionPacket& p) {
 }
 
 /** Sent to peer to request transferring to the play protocol. */
-struct RequestTransferPacket {
+struct HandshakeRequestTransferPacket {
     static constexpr uint16_t ID = 1;
     std::string host;
 };
 
 template<typename S>
-void serialize(S& s, RequestTransferPacket& p) {
+void serialize(S& s, HandshakeRequestTransferPacket& p) {
     s.text1b(p.host, 64);
 }

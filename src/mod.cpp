@@ -9,6 +9,7 @@ namespace R2MP {
 
 	void MOD_EngineTick() {
 		LOG_PollConsole();
+		NTW_PollPackets();
 		GAM_fn_vEngine();
 	}
 

@@ -2,12 +2,6 @@
 
 #include "../network.h"
 
-/** Stores details on a connection established through peer-2-peer. */
-struct EstablishedConnection {
-	std::string hostname;
-	int port;
-};
-
 /** Stores details for a single P2P connection. */
 class P2PConnection {
 private:
@@ -24,10 +18,13 @@ public:
 	void connect();
 
 	/** Hands over this connection to ENet. */
-	EstablishedConnection handover();
+	ConnectionDetails handover();
 
 	/** Destroys the connection. */
 	void destroy();
+	
+	/** Handles the given packet. */
+	void handle(DecodedPacket& packet);
 
 	/** Sends a packet to the peer. */
 	template<typename T>

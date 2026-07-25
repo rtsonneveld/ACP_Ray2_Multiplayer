@@ -36,15 +36,9 @@ void RaymanServer::tick() {
 				break;
 			}
 			case ENET_EVENT_TYPE_RECEIVE: {
-				LOG_Print("[server] Received packet of length %u from %s:%d", event.packet->dataLength, event.peer->address.host, event.peer->address.port);
-				auto decoder = NTW_DecodePacket(reinterpret_cast<uint8_t*>(event.packet->data), event.packet->dataLength);
-				switch (decoder.id()) {
-				case 0: {
-					auto packet = decoder.get<ServerboundMovePacket>();
-					LOG_Print("[server] Received movement packet!");
-					break;
-				}
-				}
+				auto decoded = NTW_DecodePacket(reinterpret_cast<uint8_t*>(event.packet->data), event.packet->dataLength);
+				std::lock_guard<std::mutex> lock(queueMutex);
+				packetQueue.push(std::move(decoded));
 				enet_packet_destroy(event.packet);
 				break;
 			}
@@ -87,4 +81,19 @@ std::unique_ptr<RaymanServer> createServer() {
 	address.port = DEFAULT_SERVER_PORT;
 	raymanServer->initialize(address);
 	return raymanServer;
+}
+
+void RaymanServer::poll() {
+	std::lock_guard<std::mutex> lock(queueMutex);
+	while (!packetQueue.empty()) {
+		auto& decoder = packetQueue.front();
+		switch (decoder.id()) {
+		case 0: {
+			auto packet = decoder.get<ServerboundMovePacket>();
+			LOG_Print("[server] Received movement packet!");
+			break;
+		}
+		}
+		packetQueue.pop();
+	}
 }

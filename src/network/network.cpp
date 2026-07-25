@@ -48,7 +48,7 @@ const char* GetStateName(NetworkState state) {
 	case NetworkState::SEARCHING: return "SEARCHING";
 	case NetworkState::WAITING: return "WAITING";
 	case NetworkState::HANDSHAKE: return "HANDSHAKE";
-	case NetworkState::PLAYER: return "PLAYER";
+	case NetworkState::PLAY: return "PLAY";
 	}
 	return "UNKNOWN";
 }
@@ -79,7 +79,7 @@ void NTW_Initialize(EnumTestMode testMode) {
 	}
 	atexit(enet_deinitialize);
 
-	// Load the username from the settings
+	// Load the username from the settings and apply it
 	FILE* f = fopen("mp_settings.conf", "rb");
 	if (f) {
 		size_t len;
@@ -90,20 +90,31 @@ void NTW_Initialize(EnumTestMode testMode) {
 
 		fclose(f);
 	}
-
 	if (testMode == EnumTestMode::Server) {
 		username = "ServerTest";
 	} else if (testMode == EnumTestMode::Client) {
 		username = "ClientTest";
 	}
-
-	NTW_test(testMode);
-
 	LOG_Print("Username is now: %s", username.data());
 
 	// Determine the time when the game booted up
 	auto duration = std::chrono::system_clock::now().time_since_epoch();
 	bootTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+
+	// Always create the client on boot
+	client = createClient();
+
+	// If we are testing a server, create it and instantly connect to it!
+	if (testMode == EnumTestMode::Server) {
+		server = createServer();
+	}
+	if (testMode != EnumTestMode::None) {
+		ConnectionDetails details = {
+			.hostname = "127.0.0.1",
+			.port = DEFAULT_SERVER_PORT
+		};
+		NTW_Connect(details);
+	}
 }
 
 void NTW_StartSearch() {
@@ -122,19 +133,29 @@ void NTW_ConnectToPeer() {
 	p2p->connect();
 }
 
-static void NTW_test(EnumTestMode testMode) {
-
-	if (testMode == EnumTestMode::None) return;
-
-	if (testMode == EnumTestMode::Server) {
-
-		// Create a server instance to test
-		server = createServer();
+void NTW_PollPackets() {
+	if (client != nullptr) {
+		client->poll();
 	}
+	if (server != nullptr) {
+		server->poll();
+	}
+}
 
-	// Create the client
-	client = createClient();
+void NTW_StartServer() {
+	if (server != nullptr) return;
+	server = createServer();
+}
 
-	// Attempt to connect to the server
-	client->connect("127.0.0.1", DEFAULT_SERVER_PORT);
+void NTW_Connect(ConnectionDetails connection) {
+	// Ensure we are in none or handshake when we try to connect to a server
+	if (state == NetworkState::NONE) {
+		NTW_SetState(NetworkState::NONE, NetworkState::PLAY);
+	} else if (state == NetworkState::HANDSHAKE) {
+		NTW_SetState(NetworkState::HANDSHAKE, NetworkState::PLAY);
+	} else {
+		LOG_Print("Cannot connect to server unless directly connecting or handshaking");
+		return;
+	}
+	client->connect(connection.hostname, connection.port);
 }
