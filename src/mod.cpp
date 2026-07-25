@@ -1,6 +1,20 @@
 #include "mod.h"
+#include "display/displaymanager.h"
+#include "state/statemanager.h"
 
-void MOD_EngineTick() {
-	LOG_PollConsole();
-	GAM_fn_vEngine();
+namespace R2MP {
+
+	DisplayManager displayManager;
+	StateManager stateManager;
+
+	void MOD_EngineTick() {
+		LOG_PollConsole();
+		GAM_fn_vEngine();
+	}
+
+	void MOD_fn_vDisplayAll() {
+		displayManager.Draw(stateManager);
+		GAM_fn_vDisplayAll();
+	}
+
 }
