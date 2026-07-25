@@ -63,9 +63,9 @@ add_custom_command(TARGET ACP_Ray2_Multiplayer POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
         $<TARGET_FILE:ACP_Ray2_Multiplayer>
         "$ENV{rayman2}/"
-    COMMAND powershell -Command "Start-Process -FilePath 'Ray2x.exe' -ArgumentList '-level:learn_30'"
-    COMMAND ${CMAKE_COMMAND} -E sleep 5
-    COMMAND powershell -Command "Start-Process -FilePath 'Ray2x.exe' -ArgumentList '-level:learn_30'"
+    COMMAND powershell -Command "Start-Process -FilePath 'Ray2x.exe' -ArgumentList '-level:learn_30 -testmode:server'"
+    COMMAND ${CMAKE_COMMAND} -E sleep 6
+    COMMAND powershell -Command "Start-Process -FilePath 'Ray2x.exe' -ArgumentList '-level:learn_30 -testmode:client'"
     WORKING_DIRECTORY "$ENV{rayman2}/.."
     VERBATIM
 )

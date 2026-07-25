@@ -71,7 +71,7 @@ bool NTW_SetState(NetworkState from, NetworkState to) {
 	return true;
 }
 
-void NTW_Initialize() {
+void NTW_Initialize(EnumTestMode testMode) {
 	// Initialize the ENet connectivity
 	if (enet_initialize() != 0) {
 		fprintf(stderr, "An error occurred while initializing ENet.\n");
@@ -90,6 +90,13 @@ void NTW_Initialize() {
 
 		fclose(f);
 	}
+
+	if (testMode == EnumTestMode::Server) {
+		username = "ServerTest";
+	} else if (testMode == EnumTestMode::Client) {
+		username = "ClientTest";
+	}
+
 	LOG_Print("Username is now: %s", username.data());
 
 	// Determine the time when the game booted up

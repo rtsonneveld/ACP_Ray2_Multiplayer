@@ -33,6 +33,12 @@ enum class NetworkState {
 	PLAYER
 };
 
+enum class EnumTestMode {
+	None = 0,
+	Server,
+	Client
+};
+
 /** Returns the unique id of this client session. */
 uint32_t NTW_GetClientId();
 
@@ -46,7 +52,7 @@ std::string NTW_GetUsername();
 void NTW_SetUsername(std::string username);
 
 /** Initializes multiplayer connectivity. */
-void NTW_Initialize();
+void NTW_Initialize(EnumTestMode testMode = EnumTestMode::None);
 
 /** Returns the current networking state. */
 NetworkState NTW_GetState();
