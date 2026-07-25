@@ -71,3 +71,6 @@ void NTW_StartSearch();
 
 /** Connects to the peer given the current SDP in the clipboard. */
 void NTW_ConnectToPeer();
+
+/** Test function that optionally starts a server locally and creates a client */
+static void NTW_test(EnumTestMode testMode);

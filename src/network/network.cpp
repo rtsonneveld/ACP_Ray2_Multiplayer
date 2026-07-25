@@ -97,6 +97,8 @@ void NTW_Initialize(EnumTestMode testMode) {
 		username = "ClientTest";
 	}
 
+	NTW_test(testMode);
+
 	LOG_Print("Username is now: %s", username.data());
 
 	// Determine the time when the game booted up
@@ -120,12 +122,18 @@ void NTW_ConnectToPeer() {
 	p2p->connect();
 }
 
-void NTW_test() {
+static void NTW_test(EnumTestMode testMode) {
+
+	if (testMode == EnumTestMode::None) return;
+
+	if (testMode == EnumTestMode::Server) {
+
+		// Create a server instance to test
+		server = createServer();
+	}
+
 	// Create the client
 	client = createClient();
-
-	// Create a server instance to test
-	server = createServer();
 
 	// Attempt to connect to the server
 	client->connect("127.0.0.1", DEFAULT_SERVER_PORT);
