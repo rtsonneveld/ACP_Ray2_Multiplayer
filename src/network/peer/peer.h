@@ -17,9 +17,6 @@ public:
 	/** Starts connecting using current information in clipboard. */
 	void connect();
 
-	/** Hands over this connection to ENet. */
-	ConnectionDetails handover();
-
 	/** Destroys the connection. */
 	void destroy();
 	

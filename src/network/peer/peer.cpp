@@ -84,9 +84,16 @@ void P2PConnection::handle(DecodedPacket& decoder) {
 		// When we've confirmed the transfer, if necessary start the server and hand over the connection to ENet.
 		auto packet = decoder.get<HandshakeRequestTransferPacket>();
 		if (packet.host == NTW_GetUsername()) {
+			// On the host side, create the server and connect to it immediately.
 			NTW_StartServer();
+			ConnectionDetails details = {
+				.hostname = "127.0.0.1",
+				.port = DEFAULT_SERVER_PORT
+			};
+			NTW_Connect(details);
+		} else {
+			// TODO Start up a connection like client-server over the peer connection with some reliability library
 		}
-		NTW_Connect(handover());
 		return;
 	}
 	}
@@ -134,30 +141,6 @@ void P2PConnection::send(const T& packet) {
 	}
 	auto encoded = NTW_EncodePacket(packet);
 	juice_send(agent, reinterpret_cast<const char*>(encoded.get()), encoded.length());
-}
-
-ConnectionDetails P2PConnection::handover() {
-	// Ensure the connection is successfull and we have a valid connection
-	if (!isSuccessful()) {
-		LOG_Print("Tried to hand over incomplete P2P connection");
-		exit(EXIT_FAILURE);
-	}
-
-	// Extract the connection made
-	char local[JUICE_MAX_ADDRESS_STRING_LEN];
-	char remote[JUICE_MAX_ADDRESS_STRING_LEN];
-	juice_get_selected_candidates(agent, local, sizeof(local), remote, sizeof(remote));
-	ConnectionDetails conn;
-	std::istringstream ss(remote);
-	std::string token;
-	ss >> token;
-	ss >> token;
-	ss >> token;
-	ss >> token;
-	ss >> conn.hostname;
-	ss >> conn.port;
-	destroy();
-	return conn;
 }
 
 void P2PConnection::destroy() {
