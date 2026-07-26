@@ -64,6 +64,9 @@ namespace R2MP {
 		/** Creates a new player off the given connection. */
 		uint32_t CreatePlayer(NetworkConnection* networking);
 
+		/** Removes a player that has disconnected. */
+		void RemovePlayer(uint32_t playerId);
+
 		/** Returns the unique id of this client session. */
 		uint32_t GetClientId();
 

@@ -187,11 +187,10 @@ namespace R2MP {
 		}
 
 		void P2PConnection::Destroy() {
-			// Destroy the agent
 			juice_destroy(agent);
-
-			// Wait so the OS has time to destroy the socket
-			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			if (play && IsRunningServer()) {
+				RemovePlayer(playerId);
+			}
 		}
 
 		bool P2PConnection::InPlayPhase() {

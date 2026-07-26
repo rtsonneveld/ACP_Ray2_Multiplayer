@@ -29,7 +29,6 @@ namespace R2MP {
 			running = true;
 			thread = std::thread(&RaymanClient::Tick, this);
 			thread.detach();
-			LOG::Print("Started new ENet client");
 		}
 
 		void RaymanClient::Shutdown() {

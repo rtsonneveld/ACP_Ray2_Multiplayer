@@ -37,7 +37,6 @@ namespace R2MP {
 			running = true;
 			thread = std::thread(&RaymanServer::Tick, this);
 			thread.detach();
-			LOG::Print("Started new ENet server");
 		}
 
 		void RaymanServer::Tick() {
@@ -68,7 +67,11 @@ namespace R2MP {
 						break;
 					}
 					case ENET_EVENT_TYPE_DISCONNECT: {
-						LOG::Print("Received disconnect request from %s:%d", event.peer->address.host, event.peer->address.port);
+						ClientData* data = static_cast<ClientData*>(event.peer->data);
+						if (data) {
+							uint32_t playerId = data->playerId;
+							RemovePlayer(playerId);
+						}
 						break;
 					}
 					}
@@ -77,7 +80,6 @@ namespace R2MP {
 		}
 
 		void RaymanServer::Shutdown() {
-			// Destroy the ENet server
 			running = false;
 			enet_host_destroy(server);
 		}
