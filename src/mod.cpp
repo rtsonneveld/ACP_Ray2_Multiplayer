@@ -1,11 +1,11 @@
 #include "mod.h"
 #include "util/vector.h"
 #include "display/displaymanager.h"
+#include "display/texturemanager.h"
 #include "state/statemanager.h"
 #include "network/packet/serverbound_play_packets.h"
 
 namespace R2MP {
-	DisplayManager displayManager;
 	StateManager stateManager;
 
 	std::string lastLevel = "Unknown";
@@ -36,9 +36,24 @@ namespace R2MP {
 		GAM_fn_vEngine();
 	}
 
+	bool displayInitialized = false;
+
 	void DisplayAll() {
-		displayManager.Draw(stateManager);
+
+		if (!displayInitialized) {
+			DSP::GetDisplayManager().Init();
+			displayInitialized = true;
+		}
+
+		DSP::GetDisplayManager().Draw();
 		GAM_fn_vDisplayAll();
+	}
+	
+	void ComputeTextures() {
+		// Whenever the map changes, before textures get computed, load the textures we want
+		DSP::GetTextureManager().LoadTextures();
+
+		GLI_vComputeTextures();
 	}
 
 }

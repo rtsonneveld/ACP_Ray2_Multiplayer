@@ -1,8 +1,11 @@
 #include "mod.h"
 #include "network/network.h"
+#include "display/displaymanager.h"
 #include <shellapi.h>
 #include <string>
 #include "util/strutil.h"
+
+#include <ACP_Ray2.h>
 
 std::vector<std::string> ReadCommandLineArguments()
 {
@@ -39,6 +42,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 			R2MP::PatchMutex();
 			FHK_M_lCreateHook(&GAM_fn_vEngine, R2MP::EngineTick);
 			FHK_M_lCreateHook(&GAM_fn_vDisplayAll, R2MP::DisplayAll);
+			FHK_M_lCreateHook(&GLI_vComputeTextures, R2MP::ComputeTextures);
 			R2MP::NET::Initialize(testMode == "server" ? R2MP::NET::EnumTestMode::SERVER : testMode == "client" ? R2MP::NET::EnumTestMode::CLIENT : R2MP::NET::EnumTestMode::NONE);
 			R2MP::RegisterCommands();
 			R2MP::LOG::Print("Finished starting ACP_Ray2Multiplayer");

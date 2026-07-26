@@ -1,12 +1,11 @@
 #pragma once
+#include "../constants.h"
 #include <ACP_Ray2.h>
-
-#define MP_GHOSTBONES 6
 
 namespace R2MP {
 
 	struct GhostBonePositions {
-		MTH3D_tdstVector ghostBones[MP_GHOSTBONES];
+		MTH3D_tdstVector ghostBones[Constants::GHOST_NUMBONES];
 	};
 
 	struct CharacterState {
