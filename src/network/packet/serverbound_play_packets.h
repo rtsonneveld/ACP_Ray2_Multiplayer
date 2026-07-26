@@ -5,7 +5,7 @@
 
 namespace R2MP {
 	namespace NET {
-		/** Sent to the server to indicate a movement */
+		/** Sent to the server to indicate a movement. */
 		struct ServerboundMovePacket {
 			static constexpr uint16_t ID = 0;
 			Vec3 position;
@@ -20,11 +20,26 @@ namespace R2MP {
 		struct ServerboundLoginPacket {
 			static constexpr uint16_t ID = 1;
 			std::string username;
+			Vec3 position;
+			std::string levelName;
 		};
 
 		template<typename S>
 		void serialize(S& s, ServerboundLoginPacket& p) {
 			s.text1b(p.username, Constants::MAX_PLAYER_NAME_LENGTH);
+			s.object(p.position);
+			s.text1b(p.levelName, Constants::MAX_LEVEL_NAME_LENGTH);
+		}
+
+		/** Sent to the server to indicate a level switch. */
+		struct ServerboundChangeLevelPacket {
+			static constexpr uint16_t ID = 2;
+			std::string levelName;
+		};
+
+		template<typename S>
+		void serialize(S& s, ServerboundChangeLevelPacket& p) {
+			s.text1b(p.levelName, Constants::MAX_LEVEL_NAME_LENGTH);
 		}
 	};
 };

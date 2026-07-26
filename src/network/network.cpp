@@ -15,6 +15,10 @@ namespace R2MP {
 		std::string username = "User";
 		long long bootTime = 0;
 
+		bool IsConnectedToServer() {
+			return serverbound != nullptr;
+		}
+
 		NetworkConnection* GetServerboundConnection() {
 			return serverbound;
 		}

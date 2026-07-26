@@ -7,27 +7,34 @@ namespace R2MP {
 
 		uint32_t PlayerManager::Add(NET::NetworkConnection* connection) {
 			lastPlayerId++;
+			Vec3 initialPosition = Vec3{ 0.0, 0.0, 0.0 };
 			Player player = Player{
 				.playerId = lastPlayerId,
 				.connection = connection,
 				.initialized = false,
-				.username = "Unknown"
+				.username = "Unknown",
+				.position = initialPosition,
+				.levelName = "Unknown",
 			};
 			players[lastPlayerId] = player;
 			return lastPlayerId;
 		}
 
-		void PlayerManager::Initialize(uint32_t playerId, std::string username) {
+		void PlayerManager::Initialize(uint32_t playerId, std::string username, Vec3 position, std::string levelName) {
 			if (!players.contains(playerId)) return;
 			auto& player = players[playerId];
 			player.initialized = true;
 			player.username = username;
+			player.position = position;
+			player.levelName = levelName;
 			LOG::Print("[server] Created new player with id %d called %s", lastPlayerId, username.data());
 
 			// Send this player to everyone else, and everyone else to them!
 			NET::ClientboundPlayerAddPacket packet{
 					.playerId = playerId,
-					.playerName = username
+					.playerName = username,
+					.position = position,
+					.levelName = levelName
 			};
 			BroadcastExcept(playerId, packet);
 
@@ -37,37 +44,12 @@ namespace R2MP {
 				if (!value.initialized) continue;
 				NET::ClientboundPlayerAddPacket otherPacket{
 					.playerId = id,
-					.playerName = value.username
+					.playerName = value.username,
+					.position = position,
+					.levelName = levelName
 				};
 				player.connection->Send(otherPacket);
 			}
-		}
-
-		template<typename T>
-		void PlayerManager::Broadcast(const T& packet) {
-			auto encoded = EncodePacket(packet);
-			for (const auto& [id, player] : players) {
-				if (!player.initialized) continue;
-				player.connection->SendEncoded(encoded);
-			}
-		}
-
-		template<typename T>
-		void PlayerManager::BroadcastExcept(uint32_t playerId, const T& packet) {
-			auto encoded = EncodePacket(packet);
-			for (const auto& [id, player] : players) {
-				if (!player.initialized) continue;
-				if (id == playerId) continue;
-				player.connection->SendEncoded(encoded);
-			}
-		}
-
-		template<typename T>
-		void PlayerManager::Send(uint32_t playerId, const T& packet) {
-			if (!players.contains(playerId)) return;
-			auto& player = players[playerId];
-			if (!player.initialized) continue;
-			player.connection->Send(packet);
 		}
 
 		void PlayerManager::Remove(uint32_t playerId) {
@@ -87,6 +69,10 @@ namespace R2MP {
 				delete player.connection;
 			}
 			players.erase(playerId);
+		}
+
+		Player& PlayerManager::Get(uint32_t playerId) {
+			return players[playerId];
 		}
 
 		PlayerManager& GetPlayerManager() {

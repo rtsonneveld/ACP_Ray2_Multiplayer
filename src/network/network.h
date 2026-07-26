@@ -55,6 +55,9 @@ namespace R2MP {
 			}
 		};
 
+		/** Returns whether the player is connected to a server. */
+		bool IsConnectedToServer();
+
 		/** Returns the current serverbound connection, if one exists. */
 		NetworkConnection* GetServerboundConnection();
 

@@ -35,7 +35,10 @@ namespace R2MP {
 
 			/** Sends a packet to the peer. */
 			template<typename T>
-			void Send(const T& packet);
+			void Send(const T& packet) {
+				auto encoded = EncodePacket(packet);
+				Send(encoded);
+			}
 
 			/** Sends a packet to the peer. */
 			void Send(EncodedPacket& packet);

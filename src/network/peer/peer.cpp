@@ -172,12 +172,6 @@ namespace R2MP {
 			return juice_get_state(agent) == JUICE_STATE_COMPLETED;
 		}
 
-		template<typename T>
-		void P2PConnection::Send(const T& packet) {
-			auto encoded = EncodePacket(packet);
-			Send(encoded);
-		}
-
 		void P2PConnection::Send(EncodedPacket& encoded) {
 			if (!IsSuccessful()) {
 				LOG::Print("Cannot send packet while not fully connected to peer");

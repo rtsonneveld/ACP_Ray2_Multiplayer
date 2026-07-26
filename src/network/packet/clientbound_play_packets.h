@@ -10,12 +10,16 @@ namespace R2MP {
 			static constexpr uint16_t ID = 0;
 			uint32_t playerId;
 			std::string playerName;
+			Vec3 position;
+			std::string levelName;
 		};
 
 		template<typename S>
 		void serialize(S& s, ClientboundPlayerAddPacket& p) {
 			s.value4b(p.playerId);
 			s.text1b(p.playerName, Constants::MAX_PLAYER_NAME_LENGTH);
+			s.object(p.position);
+			s.text1b(p.levelName, Constants::MAX_LEVEL_NAME_LENGTH);
 		}
 
 		/** Sent to the client to remove a player. */
@@ -46,15 +50,13 @@ namespace R2MP {
 		struct ClientboundPlayerChangeLevelPacket {
 			static constexpr uint16_t ID = 3;
 			uint32_t playerId;
-			uint16_t levelId;
-			Vec3 position;
+			std::string levelName;
 		};
 
 		template<typename S>
 		void serialize(S& s, ClientboundPlayerChangeLevelPacket& p) {
 			s.value4b(p.playerId);
-			s.value2b(p.levelId);
-			s.object(p.position);
+			s.text1b(p.levelName, Constants::MAX_LEVEL_NAME_LENGTH);
 		}
 
 		/** Response sent to the client that requests to join. */
