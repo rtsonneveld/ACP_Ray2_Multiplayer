@@ -2,11 +2,11 @@
 #include "util/vector.h"
 #include "display/displaymanager.h"
 #include "display/texturemanager.h"
-#include "state/statemanager.h"
 #include "network/packet/serverbound_play_packets.h"
+#include "constants.h"
+#include <array>
 
 namespace R2MP {
-	StateManager stateManager;
 
 	std::string lastLevel = "Unknown";
 
@@ -18,6 +18,12 @@ namespace R2MP {
 			std::string level = std::string(GAM_fn_p_szGetLevelName());
 			MTH3D_tdstVector* pCoords = &pRayman->p_stGlobalMatrix->stPos;
 			Vec3 position = Vec3{ pCoords->x, pCoords->y, pCoords->z };
+			std::array<ByteVec3, Constants::GHOST_NUMBONES> ghostBonePositions;
+
+			for (int i = 0;i < Constants::GHOST_NUMBONES;i++) {
+
+			}
+
 			if (level != lastLevel) {
 				lastLevel = level;
 				NET::ServerboundChangeLevelPacket packet{
@@ -25,8 +31,9 @@ namespace R2MP {
 				};
 				networking->Send(packet);
 			}
-			NET::ServerboundMovePacket packet{
-				.position = position
+			NET::ServerboundMovePacket packet {
+				.position = position,
+				.ghostBonePositions = ghostBonePositions
 			};
 			networking->Send(packet);
 		}

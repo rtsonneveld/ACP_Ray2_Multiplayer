@@ -1,5 +1,4 @@
 #pragma once
-#include "../state/statemanager.h"
 #include "texturemanager.h"
 #include "ghostdisplay.h"
 

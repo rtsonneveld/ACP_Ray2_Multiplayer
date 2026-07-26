@@ -10,10 +10,12 @@ namespace R2MP {
 
 		void PlayerManager::Add(uint32_t playerId, std::string username, Vec3 position, std::string levelName) {
 			Player player = Player{
-				.playerId = playerId,
-				.username = username,
-				.position = position,
-				.levelName = levelName
+				.data = {
+					.playerId = playerId,
+					.username = username,
+					.position = position,
+					.levelName = levelName
+				}
 			};
 			players[playerId] = player;
 		}

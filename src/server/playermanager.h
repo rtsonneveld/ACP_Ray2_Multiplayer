@@ -2,17 +2,16 @@
 
 #include "../util/vector.h"
 #include "../network/network.h"
+#include "../constants.h"
+#include "../common/playerdata.h"
 #include <unordered_map>
 
 namespace R2MP {
 	namespace SER {
 		struct Player {
-			uint32_t playerId;
+			CommonPlayerData data;
 			NET::NetworkConnection* connection;
 			bool initialized;
-			std::string username;
-			Vec3 position;
-			std::string levelName;
 		};
 
 		class PlayerManager {

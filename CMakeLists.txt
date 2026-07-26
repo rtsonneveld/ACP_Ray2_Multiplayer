@@ -15,10 +15,14 @@ find_library(LIBJUICE_LIBRARY NAMES juice)
 # Collect all source files in src/
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp
+    src/*.h
+    src/*.hpp
+    include/*.h
+    include/*.hpp
 )
 
 # Build as DLL
-add_library("ACP_Ray2_Multiplayer" SHARED ${SOURCES} "src/server/playermanager.cpp")
+add_library("ACP_Ray2_Multiplayer" SHARED ${SOURCES})
 
 include(ExternalProject)
 

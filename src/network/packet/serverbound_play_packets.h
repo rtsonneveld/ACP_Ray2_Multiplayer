@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../../util/vector.h"
+#include <bitsery/traits/array.h>
 #include "constants.h"
+#include <array>
 
 namespace R2MP {
 	namespace NET {
@@ -9,11 +11,13 @@ namespace R2MP {
 		struct ServerboundMovePacket {
 			static constexpr uint16_t ID = 0;
 			Vec3 position;
+			std::array<ByteVec3, Constants::GHOST_NUMBONES> ghostBonePositions;
 		};
 
 		template<typename S>
 		void serialize(S& s, ServerboundMovePacket& p) {
 			s.object(p.position);
+			s.container(p.ghostBonePositions);
 		}
 
 		/** Sent on login to authenticate and share username. */

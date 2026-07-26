@@ -9,13 +9,16 @@ namespace R2MP {
 			lastPlayerId++;
 			Vec3 initialPosition = Vec3{ 0.0, 0.0, 0.0 };
 			Player player = Player{
-				.playerId = lastPlayerId,
+				.data = {
+					.playerId = lastPlayerId,
+					.username = "Unknown",
+					.position = initialPosition,
+					.levelName = "Unknown",
+				},
 				.connection = connection,
 				.initialized = false,
-				.username = "Unknown",
-				.position = initialPosition,
-				.levelName = "Unknown",
 			};
+
 			players[lastPlayerId] = player;
 			return lastPlayerId;
 		}
@@ -24,9 +27,9 @@ namespace R2MP {
 			if (!players.contains(playerId)) return;
 			auto& player = players[playerId];
 			player.initialized = true;
-			player.username = username;
-			player.position = position;
-			player.levelName = levelName;
+			player.data.username = username;
+			player.data.position = position;
+			player.data.levelName = levelName;
 			LOG::Print("[server] Created new player with id %d called %s", lastPlayerId, username.data());
 
 			// Send this player to everyone else, and everyone else to them!
@@ -44,7 +47,7 @@ namespace R2MP {
 				if (!value.initialized) continue;
 				NET::ClientboundPlayerAddPacket otherPacket{
 					.playerId = id,
-					.playerName = value.username,
+					.playerName = value.data.username,
 					.position = position,
 					.levelName = levelName
 				};

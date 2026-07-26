@@ -21,13 +21,13 @@ namespace R2MP {
 			case 2: {
 				auto packet = decoder.Get<ClientboundPlayerPositionPacket>();
 				auto& player = CLI::GetPlayerManager().Get(packet.playerId);
-				player.position = packet.position;
+				player.data.position = packet.position;
 				break;
 			}
 			case 3: {
 				auto packet = decoder.Get<ClientboundPlayerChangeLevelPacket>();
 				auto& player = CLI::GetPlayerManager().Get(packet.playerId);
-				player.levelName = packet.levelName;
+				player.data.levelName = packet.levelName;
 				break;
 			}
 			case 4: {
@@ -43,7 +43,7 @@ namespace R2MP {
 			case 0: {
 				auto packet = decoder.Get<ServerboundMovePacket>();
 				auto& player = SER::GetPlayerManager().Get(playerId);
-				player.position = packet.position;
+				player.data.position = packet.position;
 				NET::ClientboundPlayerPositionPacket outPacket{
 					.playerId = playerId,
 					.position = packet.position
@@ -59,7 +59,7 @@ namespace R2MP {
 			case 2: {
 				auto packet = decoder.Get<ServerboundChangeLevelPacket>();
 				auto& player = SER::GetPlayerManager().Get(playerId);
-				player.levelName = packet.levelName;
+				player.data.levelName = packet.levelName;
 				NET::ClientboundPlayerChangeLevelPacket outPacket{
 					.playerId = playerId,
 					.levelName = packet.levelName

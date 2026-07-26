@@ -2,15 +2,14 @@
 
 #include "../util/vector.h"
 #include "../network/network.h"
+#include "../constants.h"
+#include "../common/playerdata.h"
 #include <unordered_map>
 
 namespace R2MP {
 	namespace CLI {
 		struct Player {
-			uint32_t playerId;
-			std::string username;
-			Vec3 position;
-			std::string levelName;
+			CommonPlayerData data;
 		};
 
 		class PlayerManager {
