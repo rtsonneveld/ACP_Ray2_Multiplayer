@@ -19,39 +19,34 @@ std::vector<std::string> ReadCommandLineArguments()
 	return args;
 }
 
-BOOL APIENTRY DllMain( HMODULE hModule, DWORD dwReason, LPVOID lpReserved )
-{
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 	std::vector<std::string> args;
 	std::string testMode = "";
 
-	switch ( dwReason )
-	{
+	switch (dwReason) {
 		case DLL_PROCESS_ATTACH:
-
+			// Read from the command line if we should run test mode
 			args = ReadCommandLineArguments();
 
 			for (int i = 0;i < args.size();i++) {
 				std::string arg = args[i];
 				if (arg.starts_with("-testmode:")) {
-					testMode = split(arg, ':')[1];
+					testMode = Split(arg, ':')[1];
 					break;
 				}
 			}
 
-			R2MP::MOD_PatchMutex();
-			FHK_M_lCreateHook(&GAM_fn_vEngine, R2MP::MOD_EngineTick);
-			FHK_M_lCreateHook(&GAM_fn_vDisplayAll, R2MP::MOD_fn_vDisplayAll);
-
-			NTW_Initialize(testMode == "server" ? EnumTestMode::Server : testMode == "client" ? EnumTestMode::Client : EnumTestMode::None);
-			R2MP::MOD_RegisterCommands();
-			LOG_Print("Finished starting ACP_Ray2Multiplayer");
-
-
+			R2MP::PatchMutex();
+			FHK_M_lCreateHook(&GAM_fn_vEngine, R2MP::EngineTick);
+			FHK_M_lCreateHook(&GAM_fn_vDisplayAll, R2MP::DisplayAll);
+			R2MP::NET::Initialize(testMode == "server" ? R2MP::NET::EnumTestMode::SERVER : testMode == "client" ? R2MP::NET::EnumTestMode::CLIENT : R2MP::NET::EnumTestMode::NONE);
+			R2MP::RegisterCommands();
+			R2MP::LOG::Print("Finished starting ACP_Ray2Multiplayer");
 			break;
 
 		case DLL_PROCESS_DETACH:
-			FHK_M_lDestroyHook(&GAM_fn_vEngine, R2MP::MOD_EngineTick);
-			FHK_M_lDestroyHook(&GAM_fn_vDisplayAll, R2MP::MOD_fn_vDisplayAll);
+			FHK_M_lDestroyHook(&GAM_fn_vEngine, R2MP::EngineTick);
+			FHK_M_lDestroyHook(&GAM_fn_vDisplayAll, R2MP::DisplayAll);
 			break;
 
 		case DLL_THREAD_ATTACH:

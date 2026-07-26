@@ -3,17 +3,16 @@
 #include "state/statemanager.h"
 
 namespace R2MP {
-
 	DisplayManager displayManager;
 	StateManager stateManager;
 
-	void MOD_EngineTick() {
-		LOG_PollConsole();
-		NTW_PollPackets();
+	void EngineTick() {
+		LOG::PollConsole();
+		NET::PollPackets();
 		GAM_fn_vEngine();
 	}
 
-	void MOD_fn_vDisplayAll() {
+	void DisplayAll() {
 		displayManager.Draw(stateManager);
 		GAM_fn_vDisplayAll();
 	}

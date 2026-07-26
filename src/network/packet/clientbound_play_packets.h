@@ -2,90 +2,71 @@
 
 #include "../../util/vector.h"
 #include "constants.h"
-#include <map>
 
-/** Sent to the client to spawn a new player. */
-struct ClientboundPlayerAddPacket {
-	static constexpr uint16_t ID = 0;
-	uint32_t playerId;
+namespace R2MP {
+	namespace NET {
+		/** Sent to the client to spawn a new player. */
+		struct ClientboundPlayerAddPacket {
+			static constexpr uint16_t ID = 0;
+			uint32_t playerId;
+			std::string playerName;
+		};
+
+		template<typename S>
+		void serialize(S& s, ClientboundPlayerAddPacket& p) {
+			s.value4b(p.playerId);
+			s.text1b(p.playerName, Constants::MAX_PLAYER_NAME_LENGTH);
+		}
+
+		/** Sent to the client to remove a player. */
+		struct ClientboundPlayerRemovePacket {
+			static constexpr uint16_t ID = 1;
+			uint32_t playerId;
+		};
+
+		template<typename S>
+		void serialize(S& s, ClientboundPlayerRemovePacket& p) {
+			s.value4b(p.playerId);
+		}
+
+		/** Sent to the client with an updated player position. */
+		struct ClientboundPlayerPositionPacket {
+			static constexpr uint16_t ID = 2;
+			uint32_t playerId;
+			Vec3 position;
+		};
+
+		template<typename S>
+		void serialize(S& s, ClientboundPlayerPositionPacket& p) {
+			s.value4b(p.playerId);
+			s.object(p.position);
+		}
+
+		/** Sent to the client when a player changes levels. */
+		struct ClientboundPlayerChangeLevelPacket {
+			static constexpr uint16_t ID = 3;
+			uint32_t playerId;
+			uint16_t levelId;
+			Vec3 position;
+		};
+
+		template<typename S>
+		void serialize(S& s, ClientboundPlayerChangeLevelPacket& p) {
+			s.value4b(p.playerId);
+			s.value2b(p.levelId);
+			s.object(p.position);
+		}
+
+		/** Response sent to the client that requests to join. */
+		struct ClientboundLoginResponsePacket {
+			static constexpr uint16_t ID = 4;
+			uint32_t playerId;
+			// TODO: add error codes/message here at some point
+		};
+
+		template<typename S>
+		void serialize(S& s, ClientboundLoginResponsePacket& p) {
+			s.value4b(p.playerId);
+		}
+	};
 };
-
-template<typename S>
-void serialize(S& s, ClientboundPlayerAddPacket& p) {
-	s.value4b(p.playerId);
-}
-
-/** Sent to the client to remove a player. */
-struct ClientboundPlayerRemovePacket {
-	static constexpr uint16_t ID = 1;
-	uint32_t playerId;
-};
-
-template<typename S>
-void serialize(S& s, ClientboundPlayerRemovePacket& p) {
-	s.value4b(p.playerId);
-}
-
-/** Sent to the client with an updated player position. */
-struct ClientboundPlayerPositionPacket {
-	static constexpr uint16_t ID = 2;
-	uint32_t playerId;
-	Vec3 position;
-};
-
-template<typename S>
-void serialize(S& s, ClientboundPlayerPositionPacket& p) {
-	s.value4b(p.playerId);
-	s.object(p.position);
-}
-
-/** Sent to the client when a player changes levels. */
-struct ClientboundPlayerChangeLevelPacket {
-	static constexpr uint16_t ID = 3;
-	uint32_t playerId;
-	uint16_t levelId;
-	Vec3 position;
-};
-
-template<typename S>
-void serialize(S& s, ClientboundPlayerChangeLevelPacket& p) {
-	s.value4b(p.playerId);
-	s.value2b(p.levelId);
-	s.object(p.position);
-}
-
-/** Response sent to the client that requests to join. */
-struct ClientboundLoginResponsePacket {
-	static constexpr uint16_t ID = 4;
-	uint32_t playerId;
-	// TODO: add error codes/message here at some point
-};
-
-template<typename S>
-void serialize(S& s, ClientboundLoginResponsePacket& p) {
-	s.value4b(p.playerId);
-}
-
-/** Player added broadcast */
-struct ClientboundAddPlayer {
-	static constexpr uint16_t ID = 5;
-	uint32_t playerId;
-	std::string playerName;
-};
-
-template<typename S>
-void serialize(S& s, ClientboundAddPlayer& p) {
-	s.value4b(p.playerId);
-	s.text4b(p.playerName, R2MP::Constants::MaxPlayerNameLength);
-}
-
-/** Player removed broadcast */
-struct ClientboundRemovePlayer {
-	static constexpr uint16_t ID = 6;
-	uint32_t playerId;
-};
-
-template<typename S>
-void serialize(S& s, ClientboundRemovePlayer& p) {
-	s.value4b(p.playerId);
-}

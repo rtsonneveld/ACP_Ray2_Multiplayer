@@ -2,5 +2,8 @@
 #include <wtypes.h>
 #include <vector>
 
+/** Converts the input string into a C++ string. */
 std::string ConvertLPCWSTRToString(LPCWSTR lpcwszStr);
-std::vector<std::string> split(const std::string& s, char delim);
+
+/** Splits the given string into a vector of strings on the given delimiter. */
+std::vector<std::string> Split(const std::string& s, char delim);

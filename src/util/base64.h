@@ -9,7 +9,7 @@ static const char kEncodeTable[] =
 "abcdefghijklmnopqrstuvwxyz"
 "0123456789+/";
 
-std::string base64_encode(char* data, std::size_t len) {
+std::string Base64Encode(char* data, std::size_t len) {
     std::string out;
     out.reserve(((len + 2) / 3) * 4);
 
@@ -34,7 +34,7 @@ std::string base64_encode(char* data, std::size_t len) {
     return out;
 }
 
-static std::array<int, 256> build_decode_table() {
+static std::array<int, 256> BuildDecodeTable() {
     std::array<int, 256> t;
     t.fill(-1);
     for (int i = 0; i < 64; ++i)
@@ -42,8 +42,8 @@ static std::array<int, 256> build_decode_table() {
     return t;
 }
 
-std::string base64_decode(const std::string& in) {
-    static const auto table = build_decode_table();
+std::string Base64Decode(const std::string& in) {
+    static const auto table = BuildDecodeTable();
     std::string out;
     out.reserve((in.size() / 4) * 3);
 

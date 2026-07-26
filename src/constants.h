@@ -1,5 +1,6 @@
 #pragma once
 
 namespace R2MP::Constants {
-	unsigned long const MaxPlayerNameLength = 64;
+	/** The maximum length of a player's username. */
+	unsigned long const MAX_PLAYER_NAME_LENGTH = 64;
 }

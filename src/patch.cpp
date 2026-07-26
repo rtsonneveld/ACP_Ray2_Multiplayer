@@ -60,7 +60,7 @@ namespace R2MP {
         return 1;
     }
 
-    void MOD_PatchMutex() {
+    void PatchMutex() {
         // Load ntdll.dll and obtain data from it
         HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll");
         if (!hNtdll) {

@@ -1,7 +1,6 @@
 #include "statemanager.h"
 
 namespace R2MP {
-
 	void StateManager::Initialize() {
 		CharacterStates = std::map<unsigned long, CharacterState>();
 	}

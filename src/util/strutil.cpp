@@ -3,9 +3,7 @@
 #include <codecvt>
 
 // Source: https://www.geeksforgeeks.org/cpp/convert-lpcwstr-to-std_string-in-cpp/
-// Function to convert LPCWSTR to std::string
-std::string ConvertLPCWSTRToString(const LPCWSTR lpcwszStr)
-{
+std::string ConvertLPCWSTRToString(const LPCWSTR lpcwszStr) {
     // Create a converter object to convert between wide
     // strings and UTF-8 encoded strings
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
@@ -18,7 +16,7 @@ std::string ConvertLPCWSTRToString(const LPCWSTR lpcwszStr)
 }
 
 // Source: https://www.cppbetterexplained.com/posts/cpp-split-string/
-std::vector<std::string> split(const std::string& s, char delim) {
+std::vector<std::string> Split(const std::string& s, char delim) {
     std::vector<std::string> parts;
     std::stringstream ss(s);
     std::string item;

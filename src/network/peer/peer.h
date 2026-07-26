@@ -2,31 +2,46 @@
 
 #include "../network.h"
 
-/** Stores details for a single P2P connection. */
-class P2PConnection {
-private:
-	juice_agent_t* agent;
+namespace R2MP {
+	namespace NET {
+		/** Stores details for a single P2P connection. */
+		class P2PConnection {
+		private:
+			juice_agent_t* agent;
+			bool play = false;
+			uint32_t playerId = 0;
 
-public:
-	/** Initializes this connection. */
-	void initialize();
+		public:
+			/** Initializes this connection. */
+			void Initialize();
 
-	/** Returns whether the connection was successfully made. */
-	bool isSuccessful();
+			/** Returns whether the connection was successfully made. */
+			bool IsSuccessful();
 
-	/** Starts connecting using current information in clipboard. */
-	void connect();
+			/** Whether this connection is in the play phase. */
+			bool InPlayPhase();
 
-	/** Destroys the connection. */
-	void destroy();
-	
-	/** Handles the given packet. */
-	void handle(DecodedPacket& packet);
+			/** Returns the player id of this connected player, if applicable. */
+			uint32_t GetPlayerId();
 
-	/** Sends a packet to the peer. */
-	template<typename T>
-	void send(const T& packet);
+			/** Starts connecting using current information in clipboard. */
+			void Connect();
+
+			/** Destroys the connection. */
+			void Destroy();
+
+			/** Handles the given packet. */
+			void Handle(DecodedPacket& packet);
+
+			/** Sends a packet to the peer. */
+			template<typename T>
+			void Send(const T& packet);
+
+			/** Sends a packet to the peer. */
+			void Send(EncodedPacket& packet);
+		};
+
+		/** Starts the process of finding peers. */
+		std::unique_ptr<P2PConnection> CreateP2P();
+	};
 };
-
-/** Starts the process of finding peers. */
-std::unique_ptr<P2PConnection> createP2P();

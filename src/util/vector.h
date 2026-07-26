@@ -1,3 +1,5 @@
+#pragma once
+
 /** A serializable 3-dimensional position vector. */
 struct Vec3 {
     float x;

@@ -1,13 +1,5 @@
 #pragma once
 
-/**
- * The networking solution works in two parts:
- * - ENet is used for a regular client-server architecture over UDP.
- * - libjuice is used for handshaking by creating a connection over STUN, once
- *	 the connection is succesfully established we create a new ENet connection
- *	 over the same port.
- */
-
 #define DEFAULT_SERVER_PORT 53123
 
 #define WIN32_LEAN_AND_MEAN
@@ -25,64 +17,99 @@
 #include "packet/registry.h"
 #include "../util/logging.h"
 
-/** Stores details on a connection with hostname and port. */
-struct ConnectionDetails {
-	std::string hostname;
-	int port;
+namespace R2MP {
+	namespace NET {
+		/** Stores details on a connection with hostname and port. */
+		struct ConnectionDetails {
+			std::string hostname;
+			int port;
+		};
+
+		/** The different states of a networking connection of an instance. */
+		enum class NetworkState {
+			NONE,
+			SEARCHING,
+			WAITING,
+			HANDSHAKE,
+			PLAY
+		};
+
+		/** The diffenent testing modes set up through command arguments. */
+		enum class EnumTestMode {
+			NONE = 0,
+			SERVER,
+			CLIENT
+		};
+
+		/** Provides networking to another side. */
+		class NetworkConnection {
+		private:
+			virtual void SendImpl(EncodedPacket& packet) = 0;
+
+		public:
+			/** Sends a packet to the server. */
+			template<typename T>
+			void Send(const T& packet) {
+				auto encoded = EncodePacket(packet);
+				SendImpl(encoded);
+			}
+		};
+
+		/** Returns the current serverbound connection, if one exists. */
+		NetworkConnection* GetServerboundConnection();
+
+		/** Sets the current serverbound networking to the given implementation. */
+		void SetServerboundConnection(NetworkConnection* networking);
+
+		/** Creates a new player off the given connection. */
+		uint32_t CreatePlayer(NetworkConnection* networking);
+
+		/** Returns the unique id of this client session. */
+		uint32_t GetClientId();
+
+		/** Returns the time when this instance booted up. */
+		long long GetBootTime();
+
+		/** Returns the username of the client. */
+		std::string GetUsername();
+
+		/** Sets the username of the client. */
+		void SetUsername(std::string username);
+
+		/** Initializes multiplayer connectivity. */
+		void Initialize(EnumTestMode testMode = EnumTestMode::NONE);
+
+		/** Returns the current networking state. */
+		NetworkState GetState();
+
+		/** Resets the networking state. */
+		void ResetState();
+
+		/** Updates the current networking state. */
+		bool SetState(NetworkState from, NetworkState to);
+
+		/** Whether this client is running a server. */
+		bool IsRunningServer();
+
+		/** Starts searching for STUN connections. */
+		void StartSearch();
+
+		/** Connects to the peer given the current SDP in the clipboard. */
+		void ConnectToPeer();
+
+		/** Runs any queued packets on the engine thread. */
+		void PollPackets();
+
+		/** Starts running a server. */
+		void StartServer();
+
+		/** Connects the client across the given connection. */
+		void ConnectToServer(ConnectionDetails connection);
+
+		/** Handles a play clientbound packet. */
+		void HandlePlayClientbound(DecodedPacket& packet);
+
+		/** Handles a play serverbound packet. */
+		void HandlePlayServerbound(uint32_t playerId, DecodedPacket& packet);
+	};
 };
-
-enum class NetworkState {
-	NONE,
-	SEARCHING,
-	WAITING,
-	HANDSHAKE,
-	PLAY
-};
-
-enum class EnumTestMode {
-	None = 0,
-	Server,
-	Client
-};
-
-/** Returns the unique id of this client session. */
-uint32_t NTW_GetClientId();
-
-/** Returns the time when this instance booted up. */
-long long NTW_GetBootTime();
-
-/** Returns the username of the client. */
-std::string NTW_GetUsername();
-
-/** Sets the username of the client. */
-void NTW_SetUsername(std::string username);
-
-/** Initializes multiplayer connectivity. */
-void NTW_Initialize(EnumTestMode testMode = EnumTestMode::None);
-
-/** Returns the current networking state. */
-NetworkState NTW_GetState();
-
-/** Resets the networking state. */
-void NTW_ResetState();
-
-/** Updates the current networking state. */
-bool NTW_SetState(NetworkState from, NetworkState to);
-
-/** Whether this client is running a server. */
-bool NTW_IsRunningServer();
-
-/** Starts searching for STUN connections. */
-void NTW_StartSearch();
-
-/** Connects to the peer given the current SDP in the clipboard. */
-void NTW_ConnectToPeer();
-
-/** Runs any queued packets on the engine thread. */
-void NTW_PollPackets();
-
-/** Starts running a server. */
-void NTW_StartServer();
-
-/** Connects the client across the given connection. */
-void NTW_Connect(ConnectionDetails connection);
