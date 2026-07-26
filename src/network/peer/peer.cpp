@@ -10,7 +10,7 @@ namespace R2MP {
 		public:
 			P2PConnection* p2p;
 
-			void SendImpl(EncodedPacket& packet) {
+			void SendEncoded(EncodedPacket& packet) {
 				p2p->Send(packet);
 			}
 		};

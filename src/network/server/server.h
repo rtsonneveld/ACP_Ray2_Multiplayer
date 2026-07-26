@@ -24,7 +24,6 @@ namespace R2MP {
 			void Tick();
 
 			/** Broadcasts the given packet. */
-			template<typename T>
 			void Broadcast(EncodedPacket& packet);
 
 			/** Sends the given packet to the given peer. */

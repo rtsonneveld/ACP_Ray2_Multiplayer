@@ -1,4 +1,5 @@
 #include "network.h"
+#include "../server/playermanager.h"
 #include "packet/clientbound_play_packets.h"
 #include "packet/serverbound_play_packets.h"
 
@@ -8,12 +9,12 @@ namespace R2MP {
 			switch (decoder.Id()) {
 			case 0: {
 				auto packet = decoder.Get<ClientboundPlayerAddPacket>();
-				LOG::Print("[client] Received add player!");
+				LOG::Print("[client] Received add player about %d called %s!", packet.playerId, packet.playerName.data());
 				break;
 			}
 			case 1: {
 				auto packet = decoder.Get<ClientboundPlayerRemovePacket>();
-				LOG::Print("[client] Received remove player!");
+				LOG::Print("[client] Received remove player about %d!", packet.playerId);
 				break;
 			}
 			case 2: {
@@ -43,7 +44,7 @@ namespace R2MP {
 			}
 			case 1: {
 				auto packet = decoder.Get<ServerboundLoginPacket>();
-				LOG::Print("[server] Received login packet from %d called %s!", playerId, packet.username.data());
+				SER::GetPlayerManager().Initialize(playerId, packet.username);
 				break;
 			}
 			}

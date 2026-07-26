@@ -18,7 +18,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 
 # Build as DLL
-add_library("ACP_Ray2_Multiplayer" SHARED ${SOURCES})
+add_library("ACP_Ray2_Multiplayer" SHARED ${SOURCES} "src/server/playermanager.cpp")
 
 include(ExternalProject)
 

@@ -43,15 +43,15 @@ namespace R2MP {
 
 		/** Provides networking to another side. */
 		class NetworkConnection {
-		private:
-			virtual void SendImpl(EncodedPacket& packet) = 0;
-
 		public:
-			/** Sends a packet to the server. */
+			/** Sends an encoded packet through this connection. */
+			virtual void SendEncoded(EncodedPacket& packet) = 0;
+
+			/** Sends a packet through this connection. */
 			template<typename T>
 			void Send(const T& packet) {
 				auto encoded = EncodePacket(packet);
-				SendImpl(encoded);
+				SendEncoded(encoded);
 			}
 		};
 

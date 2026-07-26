@@ -9,7 +9,7 @@ namespace R2MP {
 			RaymanServer* server;
 			ENetPeer* peer;
 
-			void SendImpl(EncodedPacket& packet) {
+			void SendEncoded(EncodedPacket& packet) {
 				server->Send(peer, packet);
 			}
 		};
@@ -47,11 +47,11 @@ namespace R2MP {
 					switch (event.type) {
 					case ENET_EVENT_TYPE_CONNECT: {
 						// Create a new connection for this player
-						ENetClientboundNetworking networking;
-						networking.server = this;
-						networking.peer = event.peer;
+						auto* networking = new ENetClientboundNetworking;
+						networking->server = this;
+						networking->peer = event.peer;
 						ClientData* data = new ClientData;
-						data->playerId = CreatePlayer(&networking);
+						data->playerId = CreatePlayer(networking);
 						event.peer->data = data;
 						break;
 					}
@@ -84,7 +84,6 @@ namespace R2MP {
 			enet_host_destroy(server);
 		}
 
-		template<typename T>
 		void RaymanServer::Broadcast(EncodedPacket& encoded) {
 			ENetPacket* enetPacket = enet_packet_create(encoded.Get(), encoded.Length(), ENET_PACKET_FLAG_RELIABLE);
 			enet_host_broadcast(server, 0, enetPacket);

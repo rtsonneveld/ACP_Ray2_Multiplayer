@@ -7,7 +7,7 @@ namespace R2MP {
 		public:
 			RaymanClient* client;
 
-			void SendImpl(EncodedPacket& packet) {
+			void SendEncoded(EncodedPacket& packet) {
 				client->Send(packet);
 			}
 		};

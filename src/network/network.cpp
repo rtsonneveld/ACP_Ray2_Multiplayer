@@ -2,6 +2,7 @@
 #include "client/client.h"
 #include "server/server.h"
 #include "peer/peer.h"
+#include "../server/playermanager.h"
 #include "packet/serverbound_play_packets.h"
 
 namespace R2MP {
@@ -34,12 +35,11 @@ namespace R2MP {
 				LOG::Print("Cannot create client connections when not running server");
 				return 0;
 			}
-			// TODO Implement client management on server
-			return 0;
+			return SER::GetPlayerManager().Add(networking);
 		}
 
 		void RemovePlayer(uint32_t playerId) {
-
+			SER::GetPlayerManager().Remove(playerId);
 		}
 
 		bool IsRunningServer() {
