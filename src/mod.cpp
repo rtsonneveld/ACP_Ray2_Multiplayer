@@ -3,6 +3,7 @@
 #include "display/displaymanager.h"
 #include "display/texturemanager.h"
 #include "network/packet/serverbound_play_packets.h"
+#include "bonetools.h"
 #include "constants.h"
 #include <array>
 
@@ -13,16 +14,14 @@ namespace R2MP {
 	void EngineTick() {
 		// Every tick while connected send updated position and level information!
 		HIE_tdstSuperObject* pRayman = HIE_fn_p_stFindObjectByName("Rayman");
+		HIE_tdstSuperObject* pBoneSource = DetermineBoneSource();
+
 		if (pRayman && NET::IsConnectedToServer()) {
 			auto networking = NET::GetServerboundConnection();
 			std::string level = std::string(GAM_fn_p_szGetLevelName());
-			MTH3D_tdstVector* pCoords = &pRayman->p_stGlobalMatrix->stPos;
+			MTH3D_tdstVector* pCoords = &pBoneSource->p_stGlobalMatrix->stPos;
 			Vec3 position = Vec3{ pCoords->x, pCoords->y, pCoords->z };
-			std::array<ByteVec3, Constants::GHOST_NUMBONES> ghostBonePositions;
-
-			for (int i = 0;i < Constants::GHOST_NUMBONES;i++) {
-
-			}
+			auto ghostBonePositions = GetCompressedBonePositions(pBoneSource);
 
 			if (level != lastLevel) {
 				lastLevel = level;

@@ -38,12 +38,14 @@ namespace R2MP {
 			static constexpr uint16_t ID = 2;
 			uint32_t playerId;
 			Vec3 position;
+			std::array<ByteVec3, Constants::GHOST_NUMBONES> ghostBonePositions = {};
 		};
 
 		template<typename S>
 		void serialize(S& s, ClientboundPlayerPositionPacket& p) {
 			s.value4b(p.playerId);
 			s.object(p.position);
+			s.container(p.ghostBonePositions);
 		}
 
 		/** Sent to the client when a player changes levels. */

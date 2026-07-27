@@ -19,7 +19,7 @@ namespace R2MP {
 		s.value4b(d.playerId);
 		s.text1b(d.username, Constants::MAX_PLAYER_NAME_LENGTH);
 		s.object(d.position);
-		s.object(d.ghostBonePositions);
+		s.container(d.ghostBonePositions);
 		s.text1b(d.levelName, Constants::MAX_LEVEL_NAME_LENGTH);
 	}
 }

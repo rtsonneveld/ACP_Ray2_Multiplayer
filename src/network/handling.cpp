@@ -22,6 +22,7 @@ namespace R2MP {
 				auto packet = decoder.Get<ClientboundPlayerPositionPacket>();
 				auto& player = CLI::GetPlayerManager().Get(packet.playerId);
 				player.data.position = packet.position;
+				player.data.ghostBonePositions = packet.ghostBonePositions;
 				break;
 			}
 			case 3: {
@@ -44,9 +45,11 @@ namespace R2MP {
 				auto packet = decoder.Get<ServerboundMovePacket>();
 				auto& player = SER::GetPlayerManager().Get(playerId);
 				player.data.position = packet.position;
+				player.data.ghostBonePositions = packet.ghostBonePositions;
 				NET::ClientboundPlayerPositionPacket outPacket{
 					.playerId = playerId,
-					.position = packet.position
+					.position = packet.position,
+					.ghostBonePositions = packet.ghostBonePositions,
 				};
 				SER::GetPlayerManager().BroadcastExcept(playerId, outPacket);
 				break;
