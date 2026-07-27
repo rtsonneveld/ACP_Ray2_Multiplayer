@@ -3,6 +3,7 @@
 #include "../constants.h"
 #include <string>
 #include <array>
+#include <bitset>
 
 namespace R2MP {
 	// Player data that is used both by the server and by the client
@@ -12,6 +13,7 @@ namespace R2MP {
 		Vec3 position;
 		std::array<ByteVec3, Constants::GHOST_NUMBONES> ghostBonePositions;
 		std::string levelName;
+		std::bitset<Constants::GLOBAL_BITS_NUMBITS> globalBits;
 	};
 
 	template<typename S>
@@ -21,5 +23,6 @@ namespace R2MP {
 		s.object(d.position);
 		s.container(d.ghostBonePositions);
 		s.text1b(d.levelName, Constants::MAX_LEVEL_NAME_LENGTH);
+		s.container(d.globalBits);
 	}
 }

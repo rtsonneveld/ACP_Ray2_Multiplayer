@@ -8,68 +8,88 @@ namespace R2MP {
 	namespace NET {
 		void HandlePlayClientbound(DecodedPacket& decoder) {
 			switch (decoder.Id()) {
-			case 0: {
-				auto packet = decoder.Get<ClientboundPlayerAddPacket>();
-				CLI::GetPlayerManager().Add(packet.playerId, packet.playerName, packet.position, packet.levelName);
-				break;
-			}
-			case 1: {
-				auto packet = decoder.Get<ClientboundPlayerRemovePacket>();
-				CLI::GetPlayerManager().Remove(packet.playerId);
-				break;
-			}
-			case 2: {
-				auto packet = decoder.Get<ClientboundPlayerPositionPacket>();
-				auto& player = CLI::GetPlayerManager().Get(packet.playerId);
-				player.data.position = packet.position;
-				player.data.ghostBonePositions = packet.ghostBonePositions;
-				break;
-			}
-			case 3: {
-				auto packet = decoder.Get<ClientboundPlayerChangeLevelPacket>();
-				auto& player = CLI::GetPlayerManager().Get(packet.playerId);
-				player.data.levelName = packet.levelName;
-				break;
-			}
-			case 4: {
-				auto packet = decoder.Get<ClientboundLoginResponsePacket>();
-				CLI::GetPlayerManager().SetPlayerId(packet.playerId);
-				break;
-			}
+				case 0: {
+					auto packet = decoder.Get<ClientboundPlayerAddPacket>();
+					CLI::GetPlayerManager().Add(packet.playerId, packet.playerName, packet.position, packet.levelName);
+					break;
+				}
+				case 1: {
+					auto packet = decoder.Get<ClientboundPlayerRemovePacket>();
+					CLI::GetPlayerManager().Remove(packet.playerId);
+					break;
+				}
+				case 2: {
+					auto packet = decoder.Get<ClientboundPlayerPositionPacket>();
+					auto& player = CLI::GetPlayerManager().Get(packet.playerId);
+					player.data.position = packet.position;
+					player.data.ghostBonePositions = packet.ghostBonePositions;
+					break;
+				}
+				case 3: {
+					auto packet = decoder.Get<ClientboundPlayerChangeLevelPacket>();
+					auto& player = CLI::GetPlayerManager().Get(packet.playerId);
+					player.data.levelName = packet.levelName;
+					break;
+				}
+				case 4: {
+					auto packet = decoder.Get<ClientboundLoginResponsePacket>();
+					CLI::GetPlayerManager().SetPlayerId(packet.playerId);
+					break;
+				}
+				case 5: {
+					auto packet = decoder.Get<ClientboundUpdateGlobalBitsPacket>();
+					auto& player = CLI::GetPlayerManager().Get(packet.playerId);
+					player.data.globalBits = packet.globalBits;
+
+					LOG::Print("Received global bits update for player %d, total bits set: %d", packet.playerId, packet.globalBits.count());
+
+					break;
+				}
 			}
 		}
 
 		void HandlePlayServerbound(uint32_t playerId, DecodedPacket& decoder) {
 			switch (decoder.Id()) {
-			case 0: {
-				auto packet = decoder.Get<ServerboundMovePacket>();
-				auto& player = SER::GetPlayerManager().Get(playerId);
-				player.data.position = packet.position;
-				player.data.ghostBonePositions = packet.ghostBonePositions;
-				NET::ClientboundPlayerPositionPacket outPacket{
-					.playerId = playerId,
-					.position = packet.position,
-					.ghostBonePositions = packet.ghostBonePositions,
-				};
-				SER::GetPlayerManager().BroadcastExcept(playerId, outPacket);
-				break;
-			}
-			case 1: {
-				auto packet = decoder.Get<ServerboundLoginPacket>();
-				SER::GetPlayerManager().Initialize(playerId, packet.username, packet.position, packet.levelName);
-				break;
-			}
-			case 2: {
-				auto packet = decoder.Get<ServerboundChangeLevelPacket>();
-				auto& player = SER::GetPlayerManager().Get(playerId);
-				player.data.levelName = packet.levelName;
-				NET::ClientboundPlayerChangeLevelPacket outPacket{
-					.playerId = playerId,
-					.levelName = packet.levelName
-				};
-				SER::GetPlayerManager().BroadcastExcept(playerId, outPacket);
-				break;
-			}
+				case 0: {
+					auto packet = decoder.Get<ServerboundMovePacket>();
+					auto& player = SER::GetPlayerManager().Get(playerId);
+					player.data.position = packet.position;
+					player.data.ghostBonePositions = packet.ghostBonePositions;
+					NET::ClientboundPlayerPositionPacket outPacket{
+						.playerId = playerId,
+						.position = packet.position,
+						.ghostBonePositions = packet.ghostBonePositions,
+					};
+					SER::GetPlayerManager().BroadcastExcept(playerId, outPacket);
+					break;
+				}
+				case 1: {
+					auto packet = decoder.Get<ServerboundLoginPacket>();
+					SER::GetPlayerManager().Initialize(playerId, packet.username, packet.position, packet.levelName);
+					break;
+				}
+				case 2: {
+					auto packet = decoder.Get<ServerboundChangeLevelPacket>();
+					auto& player = SER::GetPlayerManager().Get(playerId);
+					player.data.levelName = packet.levelName;
+					NET::ClientboundPlayerChangeLevelPacket outPacket{
+						.playerId = playerId,
+						.levelName = packet.levelName
+					};
+					SER::GetPlayerManager().BroadcastExcept(playerId, outPacket);
+					break;
+				}
+				case 3: {
+					auto packet = decoder.Get<ServerboundUpdateGlobalBitsPacket>();
+					auto& player = SER::GetPlayerManager().Get(playerId);
+					player.data.globalBits = packet.globalBits;
+					NET::ClientboundUpdateGlobalBitsPacket outPacket{
+						.playerId = playerId,
+						.globalBits = packet.globalBits
+					};
+					SER::GetPlayerManager().BroadcastExcept(playerId, outPacket);
+					break;
+				}
 			}
 		}
 	};

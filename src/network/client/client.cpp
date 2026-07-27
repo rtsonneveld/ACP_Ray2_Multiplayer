@@ -83,7 +83,7 @@ namespace R2MP {
 				}
 
 				// Await a packet
-				if (enet_host_service(client, &event, 50) > 0) {
+				if (enet_host_service(client, &event, 20) > 0) {
 					switch (event.type) {
 					case ENET_EVENT_TYPE_RECEIVE: {
 						auto decoded = DecodePacket(reinterpret_cast<uint8_t*>(event.packet->data), event.packet->dataLength, 0);

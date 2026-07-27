@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../../util/vector.h"
+#include "../../constants.h"
+#include <bitset>
 #include <bitsery/traits/array.h>
-#include "constants.h"
+#include <bitsery/ext/std_bitset.h>
 #include <array>
 
 namespace R2MP {
@@ -44,6 +46,17 @@ namespace R2MP {
 		template<typename S>
 		void serialize(S& s, ServerboundChangeLevelPacket& p) {
 			s.text1b(p.levelName, Constants::MAX_LEVEL_NAME_LENGTH);
+		}
+
+		/** Sent to the server to indicate a level switch. */
+		struct ServerboundUpdateGlobalBitsPacket {
+			static constexpr uint16_t ID = 3;
+			std::bitset<Constants::GLOBAL_BITS_NUMBITS> globalBits;
+		};
+
+		template<typename S>
+		void serialize(S& s, ServerboundUpdateGlobalBitsPacket& p) {
+			s.ext(p.globalBits, bitsery::ext::StdBitset{});
 		}
 	};
 };

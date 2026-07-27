@@ -1,7 +1,9 @@
 #pragma once
 
+#include <bitset>
+#include <bitsery/ext/std_bitset.h>
 #include "../../util/vector.h"
-#include "constants.h"
+#include "../../constants.h"
 
 namespace R2MP {
 	namespace NET {
@@ -71,6 +73,19 @@ namespace R2MP {
 		template<typename S>
 		void serialize(S& s, ClientboundLoginResponsePacket& p) {
 			s.value4b(p.playerId);
+		}
+
+		/** Sent to the client to update the player's global bits */
+		struct ClientboundUpdateGlobalBitsPacket {
+			static constexpr uint16_t ID = 5;
+			uint32_t playerId;
+			std::bitset<Constants::GLOBAL_BITS_NUMBITS> globalBits;
+		};
+
+		template<typename S>
+		void serialize(S& s, ClientboundUpdateGlobalBitsPacket& p) {
+			s.value4b(p.playerId);
+			s.ext(p.globalBits, bitsery::ext::StdBitset{});
 		}
 	};
 };
